@@ -1,0 +1,72 @@
+{
+    "FaceBoundingBox0": {
+        "inputs": {
+            "padding": 0,
+            "padding_percent": 0.2,
+            "index": -1,
+            "force_square": true,
+            "bbox_order": "left-to-right",
+            "analysis_models": [
+                "FaceAnalysisModels0",
+                0
+            ],
+            "image": [
+                "LoadImage(Base64)0",
+                0
+            ]
+        },
+        "class_type": "FaceBoundingBox",
+        "_meta": {
+            "title": "Face Bounding Box"
+        }
+    },
+    "FaceAnalysisModels0": {
+        "inputs": {
+            "library": "insightface",
+            "provider": "CPU"
+        },
+        "class_type": "FaceAnalysisModels",
+        "_meta": {
+            "title": "Face Analysis Models"
+        }
+    },
+    "ImageResize0": {
+        "inputs": {
+            "mode": "resize",
+            "supersample": "true",
+            "resampling": "lanczos",
+            "rescale_factor": 2,
+            "resize_width": 224,
+            "resize_height": 224,
+            "image": [
+                "FaceBoundingBox0",
+                0
+            ]
+        },
+        "class_type": "Image Resize",
+        "_meta": {
+            "title": "Image Resize"
+        }
+    },
+    "SendImage(WebSocket)0": {
+        "inputs": {
+            "images": [
+                "ImageResize0",
+                0
+            ]
+        },
+        "class_type": "ETN_SendImageWebSocket",
+        "_meta": {
+            "title": "Send Image (WebSocket)"
+        }
+    },
+    "LoadImage(Base64)0": {
+        "inputs": {
+            "image": ""
+        },
+        "class_type": "ETN_LoadImageBase64",
+        "_meta": {
+            "title": "Load Image (Base64)"
+        }
+    }
+}

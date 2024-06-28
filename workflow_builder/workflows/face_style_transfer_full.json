@@ -1,0 +1,244 @@
+{
+    "LoadCheckpoint0": {
+        "inputs": {
+            "ckpt_name": "juggernautXL_v9Rdphoto2Lightning.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "Load Checkpoint"
+        }
+    },
+    "EmptyLatentImage0": {
+        "inputs": {
+            "width": 1024,
+            "height": 1024,
+            "batch_size": 1
+        },
+        "class_type": "EmptyLatentImage",
+        "_meta": {
+            "title": "Empty Latent Image"
+        }
+    },
+    "CLIPTextEncode(Prompt)Positive0": {
+        "inputs": {
+            "text": "(pixar style:1.3) of 8 year old asian girl, neutral background, neutral lighting",
+            "clip": [
+                "LoraLoaderStack0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Positive"
+        }
+    },
+    "CLIPTextEncode(Prompt)Negative0": {
+        "inputs": {
+            "text": "weird, ugly, deformed, blurry, shiny, realistic, cinematic, photograph",
+            "clip": [
+                "LoraLoaderStack0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Negative"
+        }
+    },
+    "Seed(rgthree)0": {
+        "inputs": {
+            "seed": 208008663015693
+        },
+        "class_type": "Seed (rgthree)",
+        "_meta": {
+            "title": "Seed (rgthree)"
+        }
+    },
+    "IPAdapterUnifiedLoaderFaceID0": {
+        "inputs": {
+            "preset": "FACEID PORTRAIT UNNORM - SDXL only (strong)",
+            "lora_strength": 0.6,
+            "provider": "CPU",
+            "model": [
+                "LoraLoaderStack0",
+                0
+            ]
+        },
+        "class_type": "IPAdapterUnifiedLoaderFaceID",
+        "_meta": {
+            "title": "IPAdapter Unified Loader FaceID"
+        }
+    },
+    "IPAdapterFaceID0": {
+        "inputs": {
+            "weight": 0.5,
+            "weight_faceidv2": 1.0,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                1
+            ],
+            "image": [
+                "LoadImage(Base64)0",
+                0
+            ]
+        },
+        "class_type": "IPAdapterFaceID",
+        "_meta": {
+            "title": "IPAdapter FaceID"
+        }
+    },
+    "KSampler0": {
+        "inputs": {
+            "seed": [
+                "Seed(rgthree)0",
+                0
+            ],
+            "steps": 6,
+            "cfg": 1.6,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "normal",
+            "denoise": 1,
+            "model": [
+                "IPAdapterFaceID0",
+                0
+            ],
+            "positive": [
+                "ApplyControlNet(Advanced)0",
+                0
+            ],
+            "negative": [
+                "ApplyControlNet(Advanced)0",
+                1
+            ],
+            "latent_image": [
+                "EmptyLatentImage0",
+                0
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSampler"
+        }
+    },
+    "VAEDecode0": {
+        "inputs": {
+            "samples": [
+                "KSampler0",
+                0
+            ],
+            "vae": [
+                "LoadCheckpoint0",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "ApplyControlNet(Advanced)0": {
+        "inputs": {
+            "strength": 0.3,
+            "start_percent": 0,
+            "end_percent": 0.4,
+            "positive": [
+                "CLIPTextEncode(Prompt)Positive0",
+                0
+            ],
+            "negative": [
+                "CLIPTextEncode(Prompt)Negative0",
+                0
+            ],
+            "control_net": [
+                "LoadControlNetModel0",
+                0
+            ],
+            "image": [
+                "CannyEdge0",
+                0
+            ]
+        },
+        "class_type": "ControlNetApplyAdvanced",
+        "_meta": {
+            "title": "Apply ControlNet (Advanced)"
+        }
+    },
+    "LoadControlNetModel0": {
+        "inputs": {
+            "control_net_name": "SDXL/controlnet-canny-sdxl-1.0/diffusion_pytorch_model_V2.safetensors"
+        },
+        "class_type": "ControlNetLoader",
+        "_meta": {
+            "title": "Load ControlNet Model"
+        }
+    },
+    "CannyEdge0": {
+        "inputs": {
+            "low_threshold": 150,
+            "high_threshold": 300,
+            "resolution": 512,
+            "image": [
+                "LoadImage(Base64)0",
+                0
+            ]
+        },
+        "class_type": "CannyEdgePreprocessor",
+        "_meta": {
+            "title": "Canny Edge"
+        }
+    },
+    "SendImage(WebSocket)0": {
+        "inputs": {
+            "images": [
+                "VAEDecode0",
+                0
+            ]
+        },
+        "class_type": "SaveImageWebsocket",
+        "_meta": {
+            "title": "Save Image (WebSocket)"
+        }
+    },
+    "LoadImage(Base64)0": {
+        "inputs": {
+            "image": ""
+        },
+        "class_type": "ETN_LoadImageBase64",
+        "_meta": {
+            "title": "Load Image (Base64)"
+        }
+    },
+    "LoraLoaderStack0": {
+        "inputs": {
+            "lora_01": "None",
+            "strength_01": 1,
+            "lora_02": "None",
+            "strength_02": 1,
+            "lora_03": "None",
+            "strength_03": 1,
+            "lora_04": "None",
+            "strength_04": 1,
+            "model": [
+                "LoadCheckpoint0",
+                0
+            ],
+            "clip": [
+                "LoadCheckpoint0",
+                1
+            ]
+        },
+        "class_type": "Lora Loader Stack (rgthree)",
+        "_meta": {
+            "title": "Lora Loader Stack (rgthree)"
+        }
+    }
+}

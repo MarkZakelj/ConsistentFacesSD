@@ -1,0 +1,725 @@
+{
+  "3": {
+    "inputs": {
+      "seed": [
+        "46",
+        0
+      ],
+      "steps": 4,
+      "cfg": 1.7,
+      "sampler_name": "dpmpp_sde",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "85",
+        0
+      ],
+      "negative": [
+        "85",
+        1
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler PreGen"
+    }
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "juggernautXL_v9Rdphoto2Lightning.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "5": {
+    "inputs": {
+      "width": [
+        "69",
+        2
+      ],
+      "height": [
+        "70",
+        2
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "(cinematic still:1.2) of a adult caucasian woman cooking lunch at home, with 8 year old latina girl, vivid colours, high quality",
+      "clip": [
+        "52",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt) Positive"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "weird, ugly, deformed, blurry",
+      "clip": [
+        "52",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt) Negative"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "10": {
+    "inputs": {
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "24": {
+    "inputs": {
+      "weight": 0.7000000000000001,
+      "weight_faceidv2": 1,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "25",
+        0
+      ],
+      "ipadapter": [
+        "25",
+        1
+      ],
+      "image": [
+        "26",
+        0
+      ],
+      "attn_mask": [
+        "68",
+        1
+      ]
+    },
+    "class_type": "IPAdapterFaceID",
+    "_meta": {
+      "title": "IPAdapter FaceID 0"
+    }
+  },
+  "25": {
+    "inputs": {
+      "preset": "FACEID PLUS V2",
+      "lora_strength": 0.6,
+      "provider": "OpenVINO",
+      "model": [
+        "52",
+        0
+      ]
+    },
+    "class_type": "IPAdapterUnifiedLoaderFaceID",
+    "_meta": {
+      "title": "IPAdapter Unified Loader FaceID"
+    }
+  },
+  "26": {
+    "inputs": {
+      "image": "cin-40-cau-fem.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image Face 0"
+    }
+  },
+  "29": {
+    "inputs": {
+      "weight": 0.7000000000000001,
+      "weight_faceidv2": 1,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "24",
+        0
+      ],
+      "ipadapter": [
+        "25",
+        1
+      ],
+      "image": [
+        "31",
+        0
+      ],
+      "attn_mask": [
+        "68",
+        2
+      ]
+    },
+    "class_type": "IPAdapterFaceID",
+    "_meta": {
+      "title": "IPAdapter FaceID 1"
+    }
+  },
+  "30": {
+    "inputs": {
+      "image": "cin-08-lat-fem.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image Face 1"
+    }
+  },
+  "31": {
+    "inputs": {
+      "interpolation": "LANCZOS",
+      "crop_position": "center",
+      "sharpening": 0.2,
+      "image": [
+        "30",
+        0
+      ]
+    },
+    "class_type": "PrepImageForClipVision",
+    "_meta": {
+      "title": "Prep Image For ClipVision"
+    }
+  },
+  "32": {
+    "inputs": {
+      "seed": [
+        "46",
+        0
+      ],
+      "steps": 6,
+      "cfg": 1.8,
+      "sampler_name": "dpmpp_sde",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": [
+        "29",
+        0
+      ],
+      "positive": [
+        "38",
+        0
+      ],
+      "negative": [
+        "38",
+        1
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "33": {
+    "inputs": {
+      "samples": [
+        "32",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "34": {
+    "inputs": {
+      "images": [
+        "33",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "37": {
+    "inputs": {
+      "control_net_name": "thibaud_xl_openpose.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Load ControlNet Model"
+    }
+  },
+  "38": {
+    "inputs": {
+      "strength": 1,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "control_net": [
+        "37",
+        0
+      ],
+      "image": [
+        "68",
+        0
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet (Advanced)"
+    }
+  },
+  "45": {
+    "inputs": {
+      "images": [
+        "47",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "46": {
+    "inputs": {
+      "seed": 815178964325687
+    },
+    "class_type": "Seed (rgthree)",
+    "_meta": {
+      "title": "Seed (rgthree)"
+    }
+  },
+  "47": {
+    "inputs": {
+      "detect_hand": "disable",
+      "detect_body": "enable",
+      "detect_face": "enable",
+      "resolution": 512,
+      "bbox_detector": "yolox_l.onnx",
+      "pose_estimator": "dw-ll_ucoco_384.onnx",
+      "image": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "DWPreprocessor",
+    "_meta": {
+      "title": "DWPose Estimator"
+    }
+  },
+  "50": {
+    "inputs": {
+      "image1": [
+        "26",
+        0
+      ],
+      "image2": [
+        "30",
+        0
+      ]
+    },
+    "class_type": "ImpactMakeImageList",
+    "_meta": {
+      "title": "Make Image List"
+    }
+  },
+  "52": {
+    "inputs": {
+      "lora_01": "None",
+      "strength_01": 1,
+      "lora_02": "None",
+      "strength_02": 1,
+      "lora_03": "None",
+      "strength_03": 1,
+      "lora_04": "None",
+      "strength_04": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "Lora Loader Stack (rgthree)",
+    "_meta": {
+      "title": "Lora Loader Stack (rgthree)"
+    }
+  },
+  "63": {
+    "inputs": {
+      "input_faces": [
+        "50",
+        0
+      ],
+      "target_faces": [
+        "66",
+        0
+      ]
+    },
+    "class_type": "FaceMatcher",
+    "_meta": {
+      "title": "Face Matcher"
+    }
+  },
+  "66": {
+    "inputs": {
+      "padding": 0,
+      "padding_percent": 0.2,
+      "index": -1,
+      "force_square": true,
+      "bbox_order": "left-to-right",
+      "analysis_models": [
+        "67",
+        0
+      ],
+      "image": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "FaceBoundingBox",
+    "_meta": {
+      "title": "Face Bounding Box"
+    }
+  },
+  "67": {
+    "inputs": {
+      "library": "insightface",
+      "provider": "OpenVINO"
+    },
+    "class_type": "FaceAnalysisModels",
+    "_meta": {
+      "title": "Face Analysis Models"
+    }
+  },
+  "68": {
+    "inputs": {
+      "use_keypoints": "face+shoulders",
+      "mask_width": [
+        "69",
+        2
+      ],
+      "mask_height": [
+        "70",
+        2
+      ],
+      "n_poses": 2,
+      "dilate_iterations": 20,
+      "pose_keypoint": [
+        "47",
+        1
+      ],
+      "mask_mapping": [
+        "63",
+        0
+      ],
+      "face_bbox": [
+        "66",
+        5
+      ]
+    },
+    "class_type": "MaskFromPoints",
+    "_meta": {
+      "title": "Mask From Points"
+    }
+  },
+  "69": {
+    "inputs": {
+      "number_type": "integer",
+      "number": 1024
+    },
+    "class_type": "Constant Number",
+    "_meta": {
+      "title": "Width"
+    }
+  },
+  "70": {
+    "inputs": {
+      "number_type": "integer",
+      "number": 1024
+    },
+    "class_type": "Constant Number",
+    "_meta": {
+      "title": "Height"
+    }
+  },
+  "71": {
+    "inputs": {
+      "images": [
+        "68",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "73": {
+    "inputs": {
+      "idx": 0,
+      "bbox": [
+        "66",
+        5
+      ],
+      "mapping": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "BBOXSelector",
+    "_meta": {
+      "title": "BBOX Selector"
+    }
+  },
+  "74": {
+    "inputs": {
+      "enabled": true,
+      "swap_model": "inswapper_128.onnx",
+      "facedetection": "retinaface_resnet50",
+      "face_restore_model": "none",
+      "face_restore_visibility": 1,
+      "codeformer_weight": 0.5,
+      "detect_gender_input": "no",
+      "detect_gender_source": "no",
+      "input_faces_index": "0",
+      "source_faces_index": "0",
+      "console_log_level": 1,
+      "max_face_height": 300,
+      "input_image": [
+        "33",
+        0
+      ],
+      "source_image": [
+        "26",
+        0
+      ],
+      "face_bbox": [
+        "73",
+        0
+      ]
+    },
+    "class_type": "ReActorFaceSwap",
+    "_meta": {
+      "title": "ReActor Fast Face Swap 0"
+    }
+  },
+  "75": {
+    "inputs": {
+      "idx": 1,
+      "bbox": [
+        "66",
+        5
+      ],
+      "mapping": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "BBOXSelector",
+    "_meta": {
+      "title": "BBOX Selector"
+    }
+  },
+  "76": {
+    "inputs": {
+      "enabled": true,
+      "swap_model": "inswapper_128.onnx",
+      "facedetection": "retinaface_resnet50",
+      "face_restore_model": "none",
+      "face_restore_visibility": 1,
+      "codeformer_weight": 0.5,
+      "detect_gender_input": "no",
+      "detect_gender_source": "no",
+      "input_faces_index": "0",
+      "source_faces_index": "0",
+      "console_log_level": 1,
+      "max_face_height": 300,
+      "input_image": [
+        "74",
+        0
+      ],
+      "source_image": [
+        "30",
+        0
+      ],
+      "face_bbox": [
+        "75",
+        0
+      ]
+    },
+    "class_type": "ReActorFaceSwap",
+    "_meta": {
+      "title": "ReActor Fast Face Swap 1"
+    }
+  },
+  "77": {
+    "inputs": {
+      "facedetection": "retinaface_resnet50",
+      "model": "codeformer-v0.1.0.pth",
+      "visibility": 0.65,
+      "codeformer_weight": 0.4,
+      "max_face_height": 300,
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "ReActorRestoreFace",
+    "_meta": {
+      "title": "Restore Face ReActor"
+    }
+  },
+  "78": {
+    "inputs": {
+      "image": [
+        "77",
+        0
+      ]
+    },
+    "class_type": "NudenetDetector",
+    "_meta": {
+      "title": "NudenetDetector"
+    }
+  },
+  "80": {
+    "inputs": {
+      "images": [
+        "74",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "81": {
+    "inputs": {
+      "images": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "84": {
+    "inputs": {
+      "pose_keypoint": ""
+    },
+    "class_type": "LoadPosesJSON",
+    "_meta": {
+      "title": "Load Poses JSON"
+    }
+  },
+  "85": {
+    "inputs": {
+      "strength": 1,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "control_net": [
+        "37",
+        0
+      ],
+      "image": [
+        "86",
+        0
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet (Advanced) PreGen"
+    }
+  },
+  "86": {
+    "inputs": {
+      "n_poses": 10,
+      "pose_keypoint": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "FilterPoses",
+    "_meta": {
+      "title": "Filter Poses"
+    }
+  },
+  "87": {
+    "inputs": {
+      "images": [
+        "78",
+        0
+      ]
+    },
+    "class_type": "ETN_SendImageWebSocket",
+    "_meta": {
+      "title": "Send Image (WebSocket)"
+    }
+  }
+}

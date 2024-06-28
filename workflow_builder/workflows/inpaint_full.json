@@ -1,0 +1,567 @@
+{
+    "ETN_SendImageWebSocket0": {
+        "inputs": {
+            "images": [
+                "NSFWDetection0",
+                0
+            ]
+        },
+        "class_type": "ETN_SendImageWebSocket",
+        "_meta": {
+            "title": "Send Image (WebSocket)"
+        }
+    },
+    "NSFWDetection0": {
+        "inputs": {
+            "score": 0.9,
+            "image": [
+                "VAEDecode1",
+                0
+            ],
+            "alternative_image": [
+                "ImagePixelate0",
+                0
+            ]
+        },
+        "class_type": "NSFWDetection",
+        "_meta": {
+            "title": "NSFWDetection"
+        }
+    },
+    "VAEDecode1": {
+        "inputs": {
+            "samples": [
+                "KSamplerPost",
+                0
+            ],
+            "vae": [
+                "PostModel",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "ImagePixelate0": {
+        "inputs": {
+            "pixelation_size": 16,
+            "num_colors": 16,
+            "init_mode": "k-means++",
+            "max_iterations": 100,
+            "dither": "False",
+            "dither_mode": "FloydSteinberg",
+            "color_palette_mode": "Brightness",
+            "reverse_palette": "False",
+            "images": [
+                "VAEDecode1",
+                0
+            ]
+        },
+        "class_type": "Image Pixelate",
+        "_meta": {
+            "title": "Image Pixelate"
+        }
+    },
+    "KSamplerPost": {
+        "inputs": {
+            "seed": 986962399402829,
+            "steps": 10,
+            "cfg": 6,
+            "sampler_name": "euler",
+            "scheduler": "sgm_uniform",
+            "denoise": 0.01,
+            "model": [
+                "PostModel",
+                0
+            ],
+            "positive": [
+                "CLIPTextEncode0",
+                0
+            ],
+            "negative": [
+                "CLIPTextEncode1",
+                0
+            ],
+            "latent_image": [
+                "SetLatentNoiseMask0",
+                0
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSamplerPost---"
+        }
+    },
+    "PostModel": {
+        "inputs": {
+            "ckpt_name": "realisticVisionV60B1_v51VAE.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "PostModel---"
+        }
+    },
+    "CLIPTextEncode0": {
+        "inputs": {
+            "text": [
+                "PositivePrompt",
+                0
+            ],
+            "clip": [
+                "PostModel",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "CLIPTextEncode1": {
+        "inputs": {
+            "text": [
+                "NegativePrompt",
+                0
+            ],
+            "clip": [
+                "PostModel",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "SetLatentNoiseMask0": {
+        "inputs": {
+            "samples": [
+                "VAEEncode0",
+                0
+            ],
+            "mask": [
+                "GrowMask0",
+                0
+            ]
+        },
+        "class_type": "SetLatentNoiseMask",
+        "_meta": {
+            "title": "Set Latent Noise Mask"
+        }
+    },
+    "PositivePrompt": {
+        "inputs": {
+            "string": "PositivePrompt"
+        },
+        "class_type": "String to Text",
+        "_meta": {
+            "title": "PositivePrompt---"
+        }
+    },
+    "NegativePrompt": {
+        "inputs": {
+            "string": ""
+        },
+        "class_type": "String to Text",
+        "_meta": {
+            "title": "NegativePrompt---"
+        }
+    },
+    "VAEEncode0": {
+        "inputs": {
+            "pixels": [
+                "ImagestoRGB1",
+                0
+            ],
+            "vae": [
+                "PostModel",
+                2
+            ]
+        },
+        "class_type": "VAEEncode",
+        "_meta": {
+            "title": "VAE Encode"
+        }
+    },
+    "GrowMask0": {
+        "inputs": {
+            "expand": 30,
+            "tapered_corners": false,
+            "mask": [
+                "InitMaskInpaint",
+                0
+            ]
+        },
+        "class_type": "GrowMask",
+        "_meta": {
+            "title": "GrowMask"
+        }
+    },
+    "ImagestoRGB1": {
+        "inputs": {
+            "images": [
+                "ImageBlendbyMask0",
+                0
+            ]
+        },
+        "class_type": "Images to RGB",
+        "_meta": {
+            "title": "Images to RGB"
+        }
+    },
+    "InitMaskInpaint": {
+        "inputs": {
+            "mask": ""
+        },
+        "class_type": "ETN_LoadMaskBase64",
+        "_meta": {
+            "title": "InitMaskInpaint---"
+        }
+    },
+    "ImageBlendbyMask0": {
+        "inputs": {
+            "blend_percentage": 1,
+            "image_a": [
+                "InitImageInpaint",
+                0
+            ],
+            "image_b": [
+                "PasteByMask0",
+                0
+            ],
+            "mask": [
+                "MaskToImage0",
+                0
+            ]
+        },
+        "class_type": "Image Blend by Mask",
+        "_meta": {
+            "title": "Image Blend by Mask"
+        }
+    },
+    "InitImageInpaint": {
+        "inputs": {
+            "image": ""
+        },
+        "class_type": "ETN_LoadImageBase64",
+        "_meta": {
+            "title": "InitImageInpaint---"
+        }
+    },
+    "PasteByMask0": {
+        "inputs": {
+            "resize_behavior": "keep_ratio_fit",
+            "image_base": [
+                "InitImageInpaint",
+                0
+            ],
+            "image_to_paste": [
+                "VAEDecode0",
+                0
+            ],
+            "mask": [
+                "MaskToRegion0",
+                0
+            ]
+        },
+        "class_type": "Paste By Mask",
+        "_meta": {
+            "title": "Paste By Mask"
+        }
+    },
+    "MaskToImage0": {
+        "inputs": {
+            "mask": [
+                "InitMaskInpaint",
+                0
+            ]
+        },
+        "class_type": "MaskToImage",
+        "_meta": {
+            "title": "Convert Mask to Image"
+        }
+    },
+    "VAEDecode0": {
+        "inputs": {
+            "samples": [
+                "KSamplerInpaint",
+                0
+            ],
+            "vae": [
+                "InpaintModel",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "MaskToRegion0": {
+        "inputs": {
+            "padding": 24,
+            "constraints": "multiple_of",
+            "constraint_x": 16,
+            "constraint_y": 16,
+            "min_width": 64,
+            "min_height": 64,
+            "batch_behavior": "match_ratio",
+            "mask": [
+                "MaskToImage0",
+                0
+            ]
+        },
+        "class_type": "Mask To Region",
+        "_meta": {
+            "title": "Mask To Region"
+        }
+    },
+    "KSamplerInpaint": {
+        "inputs": {
+            "seed": 394097373416594,
+            "steps": 20,
+            "cfg": 10,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "normal",
+            "denoise": 1,
+            "model": [
+                "LoraLoaderStack0",
+                0
+            ],
+            "positive": [
+                "INPAINT_VAEEncodeInpaintConditioning0",
+                0
+            ],
+            "negative": [
+                "INPAINT_VAEEncodeInpaintConditioning0",
+                1
+            ],
+            "latent_image": [
+                "INPAINT_VAEEncodeInpaintConditioning0",
+                3
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSamplerInpaint---"
+        }
+    },
+    "InpaintModel": {
+        "inputs": {
+            "ckpt_name": "icbinpICantBelieveIts_secoInpainting.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "InpaintModel---"
+        }
+    },
+    "LoraLoaderStack0": {
+        "inputs": {
+            "lora_01": "None",
+            "strength_01": 1,
+            "lora_02": "None",
+            "strength_02": 1,
+            "lora_03": "None",
+            "strength_03": 1,
+            "lora_04": "None",
+            "strength_04": 1,
+            "model": [
+                "InpaintModel",
+                0
+            ],
+            "clip": [
+                "InpaintModel",
+                1
+            ]
+        },
+        "class_type": "Lora Loader Stack (rgthree)",
+        "_meta": {
+            "title": "Lora Loader Stack (rgthree)"
+        }
+    },
+    "INPAINT_VAEEncodeInpaintConditioning0": {
+        "inputs": {
+            "positive": [
+                "CLIPTextEncode2",
+                0
+            ],
+            "negative": [
+                "CLIPTextEncode3",
+                0
+            ],
+            "vae": [
+                "InpaintModel",
+                2
+            ],
+            "pixels": [
+                "ImagestoRGB0",
+                0
+            ],
+            "mask": [
+                "ImageToMask0",
+                0
+            ]
+        },
+        "class_type": "INPAINT_VAEEncodeInpaintConditioning",
+        "_meta": {
+            "title": "VAE Encode & Inpaint Conditioning"
+        }
+    },
+    "CLIPTextEncode2": {
+        "inputs": {
+            "text": [
+                "PositivePrompt",
+                0
+            ],
+            "clip": [
+                "LoraLoaderStack0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "CLIPTextEncode3": {
+        "inputs": {
+            "text": [
+                "NegativePrompt",
+                0
+            ],
+            "clip": [
+                "LoraLoaderStack0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "ImagestoRGB0": {
+        "inputs": {
+            "images": [
+                "CutByMask1",
+                0
+            ]
+        },
+        "class_type": "Images to RGB",
+        "_meta": {
+            "title": "Images to RGB"
+        }
+    },
+    "ImageToMask0": {
+        "inputs": {
+            "method": "intensity",
+            "image": [
+                "CutByMask2",
+                0
+            ]
+        },
+        "class_type": "Image To Mask",
+        "_meta": {
+            "title": "Image To Mask"
+        }
+    },
+    "CutByMask1": {
+        "inputs": {
+            "force_resize_width": [
+                "ImpactImageInfo0",
+                2
+            ],
+            "force_resize_height": [
+                "ImpactImageInfo0",
+                1
+            ],
+            "image": [
+                "InitImageInpaint",
+                0
+            ],
+            "mask": [
+                "MaskToRegion0",
+                0
+            ]
+        },
+        "class_type": "Cut By Mask",
+        "_meta": {
+            "title": "Cut By Mask"
+        }
+    },
+    "CutByMask2": {
+        "inputs": {
+            "force_resize_width": [
+                "ImpactImageInfo0",
+                2
+            ],
+            "force_resize_height": [
+                "ImpactImageInfo0",
+                1
+            ],
+            "image": [
+                "MaskToImage0",
+                0
+            ],
+            "mask": [
+                "MaskToRegion0",
+                0
+            ]
+        },
+        "class_type": "Cut By Mask",
+        "_meta": {
+            "title": "Cut By Mask"
+        }
+    },
+    "ImpactImageInfo0": {
+        "inputs": {
+            "value": [
+                "ImageResize0",
+                0
+            ]
+        },
+        "class_type": "ImpactImageInfo",
+        "_meta": {
+            "title": "ImpactImageInfo"
+        }
+    },
+    "ImageResize0": {
+        "inputs": {
+            "action": "resize only",
+            "smaller_side": 512,
+            "larger_side": 0,
+            "scale_factor": 0,
+            "resize_mode": "any",
+            "side_ratio": "0",
+            "crop_pad_position": 0,
+            "pad_feathering": 0,
+            "pixels": [
+                "CutByMask0",
+                0
+            ]
+        },
+        "class_type": "ImageResize",
+        "_meta": {
+            "title": "Image Resize"
+        }
+    },
+    "CutByMask0": {
+        "inputs": {
+            "force_resize_width": 0,
+            "force_resize_height": 0,
+            "image": [
+                "InitImageInpaint",
+                0
+            ],
+            "mask": [
+                "MaskToRegion0",
+                0
+            ]
+        },
+        "class_type": "Cut By Mask",
+        "_meta": {
+            "title": "Cut By Mask"
+        }
+    }
+}
