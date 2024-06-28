@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from katalystai.services.workflow_builder.workflow_utils import replace_key
+from workflow_builder.workflow_utils import replace_key
 
 
 def main():

@@ -3,14 +3,14 @@ import json
 from functools import wraps
 from typing import Literal
 
-from katalystai.services.workflow_builder import workflow_utils as wfu
-from katalystai.services.workflow_builder.errors import CharacterIdNotInRangeError
-from katalystai.services.workflow_builder.nodes import (
+from workflow_builder import workflow_utils as wfu
+from workflow_builder.errors import CharacterIdNotInRangeError
+from workflow_builder.nodes import (
     ApplyControlnet,
     IPAdapterFaceID,
     Manager,
 )
-from katalystai.services.workflow_builder.workflow_utils import is_image_filename
+from workflow_builder.workflow_utils import is_image_filename
 
 MAX_CHARACTERS = 2  # maximum number of characters that can be used in the multiple character workflow
 
