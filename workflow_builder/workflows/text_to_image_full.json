@@ -287,22 +287,10 @@
             "title": "FaceDetailer"
         }
     },
-    "NudenetDetector0": {
-        "inputs": {
-            "image": [
-                "FaceDetailer0",
-                0
-            ]
-        },
-        "class_type": "NudenetDetector",
-        "_meta": {
-            "title": "NudenetDetector"
-        }
-    },
     "SendImage(WebSocket)0": {
         "inputs": {
             "images": [
-                "NudenetDetector0",
+                "FaceDetailer0",
                 0
             ]
         },
