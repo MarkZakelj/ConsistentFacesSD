@@ -1,0 +1,75 @@
+exclude: "docs|node_modules|migrations|.tox|^.git$"
+default_stages: [commit, push]
+fail_fast: true
+default_language_version:
+    python: python3.11
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+        exclude: "api/config.yml|api/testdata/config.yml"
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: "ecs-params*|helm*"
+      - id: check-merge-conflict
+
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--settings-file=./py-backend/setup.cfg"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        args: ["--config=py-backend/setup.cfg"]
+        additional_dependencies: [flake8-isort]
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: 1545bdafae6bb37d1826f54dbfc41abc7b73774b
+    hooks:
+      - id: eslint
+        stages: [commit]
+        additional_dependencies:
+          - eslint@8.56.0
+          - eslint-plugin-vue
+          - eslint-config-standard
+          - eslint-plugin-node
+          - eslint-plugin-promise
+          - eslint-plugin-unicorn
+          - eslint-plugin-import
+          - eslint-plugin-n
+          - vue-eslint-parser
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
+        args:
+          [
+            "--fix",
+            "--ext",
+            ".js",
+            "--ext",
+            ".vue",
+            "--ignore-path",
+            "./.gitignore",
+            "--config",
+            "frontend/.eslintrc.js",
+            "frontend",
+          ]
+        types: [file]
+        types_or: [javascript, jsx, ts, tsx, vue]
+
+
+# sets up .pre-commit-ci.yaml to ensure pre-commit dependencies stay up to date
+ci:
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
