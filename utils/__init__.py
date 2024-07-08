@@ -1,7 +1,7 @@
 import io
 import traceback
 
-from sequential_timer import SequentialTimer
+from .sequential_timer import SequentialTimer
 
 
 def get_exception_traceback_str(exc: Exception) -> str:
