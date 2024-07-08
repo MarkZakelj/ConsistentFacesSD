@@ -16,13 +16,16 @@ load_dotenv()
 
 JSONHEADERS = {"Content-Type": "application/json"}
 
-ws_uri_template = os.environ["WS_URI_TEMPLATE"]
-comfy_url_template = os.environ["COMFY_URL_TEMPLATE"]
+COMFY_HOST = os.getenv("COMFY_HOST", "localhost")
+COMFY_PORT = os.getenv("COMFY_PORT", "7860")
+
+ws_uri_template = f"ws://{COMFY_HOST}:{COMFY_PORT}/ws?clientId={{client_id}}"
+comfy_url = f"http://{COMFY_HOST}:{COMFY_PORT}/prompt"
 
 
-async def websocket_get_image(prompt_id: str, hostaddr: str, client_id: str, verbose=False):
+async def websocket_get_image(prompt_id: str, client_id: str, verbose=False):
     imgs = []
-    uri = ws_uri_template.format(hostaddr, client_id)
+    uri = ws_uri_template.format(client_id)
     async with websockets.connect(uri, max_size=2 ** 25, close_timeout=100) as ws:
         st = SequentialTimer()
         while True:
@@ -54,12 +57,10 @@ async def websocket_get_image(prompt_id: str, hostaddr: str, client_id: str, ver
 
 
 async def comfy_send_request(payload, req_id):
-    attempts = 0
     imgs = []
-    target_addr = ""
     timings = {}
     try:
-        response = requests.post(comfy_url_template.format(target_addr), json=payload, headers=JSONHEADERS)
+        response = requests.post(comfy_url, json=payload, headers=JSONHEADERS)
         if response.status_code != 200:
             logger.error(
                 "RequestFailed with non 200 status code, get new address\nSTATUS CODE: {status_code}\nERROR: {error}",
@@ -69,7 +70,7 @@ async def comfy_send_request(payload, req_id):
         else:
             res = response.json()
             prompt_id = res["prompt_id"]
-            imgs, timings = await websocket_get_image(prompt_id, target_addr, req_id)
+            imgs, timings = await websocket_get_image(prompt_id, req_id)
             if len(imgs) == 0:
                 logger.error(
                     "No images received from comfy, TIMINGS:\n{timings}",
