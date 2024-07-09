@@ -13,7 +13,7 @@ from loguru import logger
 
 random.seed(42)
 
-NSEEDS = 3
+NSEEDS = 5
 
 
 async def main():
@@ -30,7 +30,7 @@ async def main():
         "cfg": 1.8,
         "steps": 6,
         "checkpoint": "juggernautXL_v9Rdphoto2Lightning.safetensors",
-        "negative_prompt": "weird, ugly, deformed, low contrast, bad",
+        "negative_prompt": "weird, ugly, deformed, low contrast, bad anatomy, disfigured",
 
     }
     json.dump(info, open(os.path.join(img_save_path, "info.json"), 'w'), indent=2)
@@ -38,8 +38,7 @@ async def main():
         # use 3 different seeds for each prompt
         for j in range(NSEEDS):
             prompt = replace_with_random_person(line)
-            info['n_images'] += 1
-            img_num = i * 3 + j
+            img_num = i * NSEEDS + j
             logger.info(f"Processing image {img_num} - {prompt}")
 
             seed = random.randint(0, 9999999999999)
@@ -67,8 +66,8 @@ async def main():
             img = imgs[0]
             rgb_img = img.convert('RGB')
             img_num_string = f"{img_num:08}"
-            rgb_img.save(os.path.join(img_save_path, f"{img_num_string}.jpg"), "JPEG", quality=80)
-            json.dump(img_info, open(os.path.join(img_save_path, f"{img_num_string}.json"), 'w'))
+            rgb_img.save(os.path.join(img_save_path, 'images', f"{img_num_string}.jpg"), "JPEG", quality=80)
+            json.dump(img_info, open(os.path.join(img_save_path, 'img_info', f"{img_num_string}.json"), 'w'))
 
 
 if __name__ == '__main__':
