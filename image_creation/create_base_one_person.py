@@ -4,10 +4,10 @@ import os
 import random
 import uuid
 
-from loguru import logger
-
 from comfy_requests import comfy_send_request
+from loguru import logger
 from prompt_construction import process_file, replace_with_random_person
+
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
