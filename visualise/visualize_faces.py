@@ -13,9 +13,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Face Detection for a given subset of images."
     )
-    parser.add_argument(
-        "subset_name", type=str, help="The name of the subset"
-    )
+    parser.add_argument("subset_name", type=str, help="The name of the subset")
     args = parser.parse_args()
     subset_name = args.subset_name
 
@@ -31,5 +29,5 @@ def main():
         cv2.destroyAllWindows()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
