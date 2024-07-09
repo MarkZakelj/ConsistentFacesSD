@@ -5,12 +5,11 @@ from io import BytesIO
 
 import requests
 import websockets
-from PIL import Image
 from dotenv import load_dotenv
 from loguru import logger
+from PIL import Image
 
-from utils import SequentialTimer
-from utils import get_exception_traceback_str
+from utils import SequentialTimer, get_exception_traceback_str
 
 load_dotenv()
 
@@ -28,7 +27,7 @@ comfy_url = f"http://{COMFY_HOST}:{COMFY_PORT}/prompt"
 async def websocket_get_image(prompt_id: str, client_id: str, verbose=False):
     imgs = []
     uri = ws_uri_template.format(client_id=client_id)
-    async with websockets.connect(uri, max_size=2 ** 25, close_timeout=100) as ws:
+    async with websockets.connect(uri, max_size=2**25, close_timeout=100) as ws:
         st = SequentialTimer()
         while True:
             # error is thrown if timeout - happens when comfy receives identical payload
@@ -78,7 +77,7 @@ async def comfy_send_request(payload, req_id):
             if len(imgs) == 0:
                 logger.error(
                     "No images received from comfy, TIMINGS:\n{timings}",
-                    timings=timings
+                    timings=timings,
                 )
     except Exception as e:
         logger.error(

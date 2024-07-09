@@ -19,7 +19,8 @@ def save_all(imgs, timings, workflow, test_name):
 async def test_connection():
     wf = TextToImageWorkflowManager()
     wf.basic.set_prompt(
-        "(cinematic still) of a young man enjoying the sunset on the beach, with a surfboard, high quality")
+        "(cinematic still) of a young man enjoying the sunset on the beach, with a surfboard, high quality"
+    )
     wf.basic.set_negative_prompt("weird, ugly, deformed, low contrast, bad")
     wf.basic.set_height(1024)
     wf.basic.set_width(1024)
