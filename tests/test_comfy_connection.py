@@ -3,7 +3,7 @@ import uuid
 from random import randint
 
 import pytest
-from comfy_requests import comfy_send_request
+from image_creation.comfy_requests import comfy_send_request
 
 from tests import save_img_from_comfy, save_timings, save_workflow
 from workflow_builder import TextToImageWorkflowManager
