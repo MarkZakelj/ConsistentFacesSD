@@ -36,7 +36,6 @@ async def websocket_get_image(prompt_id: str, client_id: str, verbose=False):
             out = await asyncio.wait_for(ws.recv(), timeout=90)
 
             if isinstance(out, str):
-                logger.info("out:" + out)
                 message = json.loads(out)
                 if message["type"] == "executing":
                     data = message["data"]
