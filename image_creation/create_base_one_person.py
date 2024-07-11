@@ -5,9 +5,10 @@ import random
 import uuid
 
 from comfy_requests import comfy_send_request
-from loguru import logger
 from prompt_construction import process_file, replace_with_random_person
+from tqdm import tqdm
 
+from utils.imgs import image_exists
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
@@ -15,30 +16,70 @@ random.seed(42)
 
 NSEEDS = 5
 
+configs: dict[str, dict[str, str]] = {
+    "base_one_person": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+    },
+    "base_one_person_dreamshaper": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+    },
+    "base_two_people_dreamshaper": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+    },
+    "base_two_people": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+    },
+}
 
-async def main():
-    raw_prompts_path = os.path.join(DATA_DIR, "raw_prompts.txt")
+
+async def generate_dataset(config_name: str):
+    conf = configs[config_name]
+    raw_prompts_path = os.path.join(DATA_DIR, conf["raw_prompts"])
     lines = process_file(raw_prompts_path)
 
-    img_save_path = os.path.join(OUTPUT_DIR, "base_one_person")
+    img_save_path = os.path.join(OUTPUT_DIR, config_name)
     os.makedirs(img_save_path, exist_ok=True)
-
+    os.makedirs(os.path.join(img_save_path, "images"), exist_ok=True)
+    os.makedirs(os.path.join(img_save_path, "img_info"), exist_ok=True)
+    total_images = len(lines) * NSEEDS
     info = {
-        "n_images": len(lines) * NSEEDS,
-        "width": 1024,
-        "height": 1024,
-        "cfg": 1.8,
-        "steps": 6,
-        "checkpoint": "juggernautXL_v9Rdphoto2Lightning.safetensors",
-        "negative_prompt": "weird, ugly, deformed, low contrast, bad anatomy, disfigured",
+        "n_images": total_images,
+        "width": conf.get("width", 1024),
+        "height": conf.get("height", 1024),
+        "cfg": conf.get("cfg", 1.8),
+        "steps": conf.get("steps", 6),
+        "checkpoint": conf.get(
+            "checkpoint", "juggernautXL_v9Rdphoto2Lightning.safetensors"
+        ),
+        "negative_prompt": conf.get(
+            "negative_prompt",
+            "weird, ugly, deformed, low contrast, bad anatomy, disfigured",
+        ),
     }
+    print("INFO:")
+    print(json.dumps(info, indent=2))
     json.dump(info, open(os.path.join(img_save_path, "info.json"), "w"), indent=2)
+
+    pbar = tqdm(total=total_images, desc="Generating images")
+
     for i, line in enumerate(lines):
-        # use 3 different seeds for each prompt
         for j in range(NSEEDS):
-            prompt = replace_with_random_person(line)
             img_num = i * NSEEDS + j
-            logger.info(f"Processing image {img_num} - {prompt}")
+            if image_exists(config_name, img_num):
+                pbar.update(1)
+                continue
+            prompt = line
+            for person_code in conf["person_codes"]:
+                prompt = replace_with_random_person(prompt, person_code)
+            pbar.set_description(
+                f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
+            )
 
             seed = random.randint(0, 9999999999999)
             img_info = {"prompt": prompt, "seed": seed}
@@ -73,7 +114,19 @@ async def main():
                     os.path.join(img_save_path, "img_info", f"{img_num_string}.json"),
                     "w",
                 ),
+                indent=2,
             )
+
+            pbar.update(1)
+
+    pbar.close()
+
+
+async def main():
+    print("Generating image datasets")
+    for config_name in configs:
+        print(f"Generating dataset for {config_name}")
+        await generate_dataset(config_name)
 
 
 if __name__ == "__main__":
