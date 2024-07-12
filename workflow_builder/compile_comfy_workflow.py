@@ -24,7 +24,7 @@ def main():
         raise ValueError("Output file should be different from the input file")
     if not args.output.endswith(".json"):
         raise ValueError("Output file should be a json file")
-    target = json.load(open(args.file, "r"))
+    target = json.load(open(args.file))
     # turn all keys into numbers to avoid conflicts
     for i, key in enumerate(list(target.keys())):
         target = replace_key(key, str(i), target)

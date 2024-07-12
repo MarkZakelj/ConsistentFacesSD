@@ -49,8 +49,7 @@ LoadImageNodeType = Literal["base64", "normal"]
 
 
 class ImageLoadSwitcher(Manager):
-    """
-    used to change the LoadImage node type to LoadImageBase64 or do the reverse
+    """used to change the LoadImage node type to LoadImageBase64 or do the reverse
     Should be used as a composable element inside other managers
     LoadImage node requires an actual image to be present on the server
             (can be included in docker build or uploaded via comfyUI beforehand)
@@ -78,8 +77,7 @@ class ImageLoadSwitcher(Manager):
         self,
         node_type: LoadImageNodeType,
     ):
-        """
-        whether to use Normal LoadImage node or LoadImageBase64 node
+        """Whether to use Normal LoadImage node or LoadImageBase64 node
         Args:
             node_type: 'base64' or 'normal'
         """
@@ -105,8 +103,7 @@ class ImageLoadSwitcher(Manager):
             self.load_image_node = self.normal_node
 
     def set_load_image_type_from_string(self, image_str: str):
-        """
-        Set the LoadImage type based on the image string
+        """Set the LoadImage type based on the image string
         Args:
             image_str: string that contains the base64 image or name of the image with extension e.g. 18-asi-mal.png
         """
@@ -164,8 +161,7 @@ class CharactersManager(Manager):
 
     @check_character_id
     def set_image(self, image: str, character_id: int):
-        """
-        Set the image for a specific character
+        """Set the image for a specific character
         Args:
             image: either base64 string of an image or image name e.g. 18-asi-mal.png
             character_id: number of the character, 0-indexed
@@ -198,11 +194,12 @@ class CharactersManager(Manager):
 
 class CharactersManagerFaceID(Manager):
     def __init__(self, workflow: dict, ip_adapter_node_base_name: str):
-        """
-        Args:
+        """Args:
+        ----
             workflow: the workflow dict
             ip_adapter_node_base_name: node key in the workflow that manages the IPadapter for character
             load_image_special_name: whatever is added after 'LoadImage' in the Load Image node key, for example
+
         """
         super().__init__(workflow)
         self.image_loaders = [
@@ -216,8 +213,7 @@ class CharactersManagerFaceID(Manager):
 
     @check_character_id
     def set_image(self, image: str, character_id: int):
-        """
-        Set the image for a specific character
+        """Set the image for a specific character
         Args:
             image: either base64 string of an image or image name e.g. 18-asi-mal.png
             character_id: number of the character, 0-indexed
@@ -283,8 +279,7 @@ class PoseMaskManager(Manager):
         )
 
     def set_use_keypoints(self, use_keypoints: str):
-        """
-        Set the used keypoints for the MaskFromPoints node - which points from skeleton to use for mask creation
+        """Set the used keypoints for the MaskFromPoints node - which points from skeleton to use for mask creation
         Args:
             use_keypoints: 'face' | 'face+shoulders' | 'face+torso' | 'full-body
         """

@@ -20,8 +20,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class FullManager(Manager):
-    """
-    Parent class for FullManagers.
+    """Parent class for FullManagers.
     Full Managers have a dedicated workflow in json files and
     are used for setting the full workflow that is used in comfy
     """

@@ -28,7 +28,7 @@ def base64_2_img(base64_string: str) -> Image.Image:
 
 
 def read_base64_image(path: str, as_image=False) -> str | Image.Image:
-    with open(path, "r") as f:
+    with open(path) as f:
         base64_string = f.read().strip()
     if as_image:
         return base64_2_img(base64_string)

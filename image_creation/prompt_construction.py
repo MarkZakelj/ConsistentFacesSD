@@ -40,7 +40,7 @@ def enchance_prompt(prompt: str, style_name: str):
 
 def process_file(file_path):
     processed_lines = []
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         for line in file.readlines():
             if line.strip() == "":
                 continue

@@ -1,13 +1,10 @@
-"""
-This file contains the definitions of single nodes that are used inside comfy.
+"""This file contains the definitions of single nodes that are used inside comfy.
 Using those nodes, we can model the exact workflow used inside comfy and enable programmatic setting of the values
 """
 
 
 class Manager:
-    """
-    Base class for all managers, contains the workflow dictionary
-    """
+    """Base class for all managers, contains the workflow dictionary"""
 
     def __init__(self, workflow=None):
         if workflow is None:

@@ -18,7 +18,7 @@ compiled_workflow_dir = os.path.join(current_dir, "compiled_workflows")
 
 
 def is_image_filename(string: str):
-    """determine whether string is image filename"""
+    """Determine whether string is image filename"""
     for ext in IMG_EXTENSIONS:
         if string.endswith(ext):
             return True
@@ -26,21 +26,19 @@ def is_image_filename(string: str):
 
 
 def remove_number_from_end(s):
-    """
-    removes number from the end of string - used for workflow keys
+    """Removes number from the end of string - used for workflow keys
     Args:
         s: string representing full workflow key with number at the end
 
-    Returns:
+    Returns
+    -------
 
     """
     return re.sub(r"\d+$", "", s)
 
 
 def replace_key(old_key: str, new_key: str, workflow: dict, inline=False) -> dict:
-    """
-    Replace key in the workflow with a new key
-    """
+    """Replace key in the workflow with a new key"""
     if not inline:
         workflow = deepcopy(workflow)
     if new_key in workflow:
@@ -60,8 +58,7 @@ def replace_key(old_key: str, new_key: str, workflow: dict, inline=False) -> dic
 def link_after(
     first_node: str, second_node: str, links: list[tuple[int, str]], workflow: dict
 ) -> None:
-    """
-    Link the after_node after the before_node node, INLINE
+    """Link the after_node after the before_node node, INLINE
     Args:
         first_node: name of the first node
         second_node: name of the second node
@@ -83,8 +80,7 @@ def link_after_and_before(
     links: list[tuple[int, str, int]],
     workflow: dict,
 ):
-    """
-    Link the middle node after the before node, and link middle_node before the nodes, the target node is connected to
+    """Link the middle node after the before node, and link middle_node before the nodes, the target node is connected to
     (replace connections
     WORKS INLINE
     Args:
@@ -114,8 +110,7 @@ def link_after_and_before(
 
 
 def remove_inputs(node_name: str, inputs: list[str], workflow: dict):
-    """
-    Remove the inputs from the node. Used for dynamically changing Nodes like "Make Image List",
+    """Remove the inputs from the node. Used for dynamically changing Nodes like "Make Image List",
     by setting them to None
     Args:
         node_name: name of the node to remove the inputs from
@@ -129,8 +124,7 @@ def remove_inputs(node_name: str, inputs: list[str], workflow: dict):
 
 
 def skip_node(node_name: str, links: list[tuple[str, int]], workflow: dict):
-    """
-    Skip the node from the workflow and link the nodes connected to the dropped node, works INLINE
+    """Skip the node from the workflow and link the nodes connected to the dropped node, works INLINE
     For the outputs not specified in the links, the connected output nodes will delete the input key on the connection
     to this node
     Args:
@@ -164,8 +158,7 @@ def skip_node(node_name: str, links: list[tuple[str, int]], workflow: dict):
 
 
 def build_digraph(workflow):
-    """
-    Build a directed graph of the workflow - directed left and right
+    """Build a directed graph of the workflow - directed left and right
     nodes in Comfy workflows only have defined inputs,
     this also adds the outputs of the nodes
     Args:
@@ -188,8 +181,7 @@ def build_digraph(workflow):
 def load_workflow(
     workflow_name: str, compiled: bool = False, abspath: bool = False
 ) -> dict:
-    """
-    Load workflow from json file
+    """Load workflow from json file
     Args:
         workflow_name: name (with .json extension) of the workflow to be loaded
         compiled: should you search the compiled_workflows folder or not
@@ -204,7 +196,7 @@ def load_workflow(
             target_dir = compiled_workflow_dir
         case (_, _):
             target_dir = workflow_dir
-    return json.load(open(os.path.join(target_dir, workflow_name), "r"))
+    return json.load(open(os.path.join(target_dir, workflow_name)))
 
 
 def get_multiples(workflow: dict) -> dict[str, list[str]]:
@@ -237,8 +229,7 @@ def get_same_class(workflow: dict, node_class) -> dict[str, dict]:
 def merge_partial_workflow(
     workflow: dict, part_workflow_name: str, overwrite: list = None
 ) -> dict:
-    """
-    Merge partial workflow into the main workflow
+    """Merge partial workflow into the main workflow
     Partial workflows are workflows that are not complete and are meant to be merged into the main workflow, e.g
     face.json, lora.json, ...
     basic.json is a standalone workflow and can be used by itself
@@ -253,21 +244,22 @@ def merge_partial_workflow(
 
 
 def trim_workflow(workflow: dict, inline=False) -> dict:
-    """
-    Trim the workflow to remove unnecessary keys, not connected (directly or indirectly) to the end node
+    """Trim the workflow to remove unnecessary keys, not connected (directly or indirectly) to the end node
     Args:
         workflow: workflow to be trimmed
         inline: create a new workflow or modify the existing one
     Returns: trimmed workflow without hanging nodes
     hangin nodes are nodes not connected to the end node in a directed graph - leaves
-    Examples:
-    =====================================
+
+    Examples
+    --------
     [Start] -> [Node1] -> [Node2] -> [End]
     all nodes are connected to the end node
     =====================================
     [Start] -> [Node1] -> [Node2] -> [End]
                        |-> [Node3]
     Node3 is a hanging node and will be removed by trimming
+
     """
     # use BFS to find all nodes connected to the end node
     dq = deque([END_KEY_NUMBERED])
@@ -286,8 +278,7 @@ def trim_workflow(workflow: dict, inline=False) -> dict:
 
 
 def remove_base64_images(workflow: dict) -> dict:
-    """
-    Remove base64 images from the workflow by changing their value to empty string
+    """Remove base64 images from the workflow by changing their value to empty string
     Do this when you want to look at the workflow, and you don't want to see the long base64 image strings
     """
     new_workflow = {}
@@ -302,8 +293,7 @@ def remove_base64_images(workflow: dict) -> dict:
 
 
 def convert_loadb64_to_load(workflow: dict, target=None, inline=False) -> dict:
-    """
-    Convert LoadBase64 nodes to LoadImage nodes in the workflow
+    """Convert LoadBase64 nodes to LoadImage nodes in the workflow
     useful for transferring the workflow to comfy and then testing
     If target is specified, only change the node with the target name
     """
@@ -320,14 +310,13 @@ def convert_loadb64_to_load(workflow: dict, target=None, inline=False) -> dict:
 
 
 def convert_load_to_loadb64(workflow: dict, target=None, inline=False) -> dict:
-    """
-    Convert LoadImage nodes to LoadImageBase64 nodes in the workflow
+    """Convert LoadImage nodes to LoadImageBase64 nodes in the workflow
     useful for transferring the workflow to comfy and then testing
     If target is specified, only change the node with the target name
     """
     if not inline:
         workflow = deepcopy(workflow)
-    for key, val in list(workflow.items()):
+    for key, _val in list(workflow.items()):
         if (target is None and "Base64" not in key and "Load" in key) or (
             key == target
         ):

@@ -15,7 +15,7 @@ def save_all(imgs, timings, workflow, test_name):
     save_workflow(workflow, test_name)
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio()
 async def test_connection():
     wf = TextToImageWorkflowManager()
     wf.basic.set_prompt(

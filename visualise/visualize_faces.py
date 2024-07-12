@@ -1,5 +1,4 @@
-"""
-Show images with bboxes around images
+"""Show images with bboxes around images
 """
 
 import argparse

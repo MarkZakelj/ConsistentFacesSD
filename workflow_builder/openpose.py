@@ -1,7 +1,5 @@
 def convert_katalist_to_openpose(keypoints, width, height) -> dict:
-    """
-    Convert the pose keypoints from the Katalist format to the OpenPose format.
-    """
+    """Convert the pose keypoints from the Katalist format to the OpenPose format."""
     pose_keypoint = {
         "people": [],
         "canvas_width": width,
