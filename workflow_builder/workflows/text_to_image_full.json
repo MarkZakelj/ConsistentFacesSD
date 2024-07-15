@@ -1,4 +1,53 @@
 {
+    "IPAdapterUnifiedLoader0": {
+        "inputs": {
+            "preset": "PLUS FACE (portraits)",
+            "model": [
+                "LoadCheckpoint0",
+                0
+            ]
+        },
+        "class_type": "IPAdapterUnifiedLoader",
+        "_meta": {
+            "title": "IPAdapter Unified Loader"
+        }
+    },
+    "IPAdapterAdvancedFace0": {
+        "inputs": {
+            "weight": 1,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoader0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoader0",
+                1
+            ],
+            "image": [
+                "LoadImageFace0",
+                0
+            ]
+        },
+        "class_type": "IPAdapterAdvanced",
+        "_meta": {
+            "title": "IPAdapter Advanced"
+        }
+    },
+    "LoadImageFace0": {
+        "inputs": {
+            "image": "",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face"
+        }
+    },
     "Seed(rgthree)0": {
         "inputs": {
             "seed": -1
@@ -15,19 +64,6 @@
         "class_type": "LoadPosesJSON",
         "_meta": {
             "title": "Load Poses JSON"
-        }
-    },
-    "FilterPoses0": {
-        "inputs": {
-            "n_poses": 10,
-            "pose_keypoint": [
-                "LoadPosesJSON0",
-                0
-            ]
-        },
-        "class_type": "FilterPoses",
-        "_meta": {
-            "title": "Filter Poses"
         }
     },
     "Width0": {
@@ -75,6 +111,19 @@
         "class_type": "CheckpointLoaderSimple",
         "_meta": {
             "title": "Load Checkpoint"
+        }
+    },
+    "FilterPoses0": {
+        "inputs": {
+            "n_poses": 10,
+            "pose_keypoint": [
+                "LoadPosesJSON0",
+                0
+            ]
+        },
+        "class_type": "FilterPoses",
+        "_meta": {
+            "title": "Filter Poses"
         }
     },
     "EmptyLatentImage0": {
@@ -183,7 +232,7 @@
             "scheduler": "karras",
             "denoise": 1,
             "model": [
-                "LoraLoaderStack(rgthree)0",
+                "IPAdapterAdvancedFace0",
                 0
             ],
             "positive": [
