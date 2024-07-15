@@ -41,11 +41,13 @@ def detect_all_faces_on_subset(subset_name: str):
             face_info.bbox = face_info.bbox.astype(np.int32).tolist()
             face_info.kps = face_info.kps.astype(np.int32).tolist()
             face_info.det_score = float(face_info.det_score)
-            info["face_info"].append({
-                "bbox": face_info.bbox,
-                "kps": face_info.kps,
-                "det_score": face_info.det_score,
-            })
+            info["face_info"].append(
+                {
+                    "bbox": face_info.bbox,
+                    "kps": face_info.kps,
+                    "det_score": face_info.det_score,
+                }
+            )
         update_img_info(subset_name, i, info)
 
 
@@ -54,7 +56,10 @@ def main():
         description="Face Detection for a given subset of images."
     )
     parser.add_argument(
-        "--subset_name", type=str, help="The name of the subset to process images for.", required=False
+        "--subset_name",
+        type=str,
+        help="The name of the subset to process images for.",
+        required=False,
     )
     args = parser.parse_args()
     subset_name = args.subset_name

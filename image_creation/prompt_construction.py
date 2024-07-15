@@ -3,8 +3,8 @@ import random
 
 random.seed(42)
 
-ages = ["5-year-old", "18-year-old", "40-year-old", "70-year-old"]
-ethnicities = [
+AGES = ["5-year-old", "18-year-old", "40-year-old", "70-year-old"]
+ETHNICITIES = [
     "black",
     "asian",
     "hispanic",
@@ -13,9 +13,9 @@ ethnicities = [
     "native american",
     "caucasian",
 ]
-sexes = ["man", "woman"]
+SEXES = ["man", "woman"]
 
-sex_young = {"man": "boy", "woman": "girl"}
+SEX_YOUNG = {"man": "boy", "woman": "girl"}
 
 prompt_enhancements = {
     "cinematic still": "(cinematic still) of {prompt} . high quality, detailed photograph, (visible face:0.8)",
@@ -23,11 +23,11 @@ prompt_enhancements = {
 
 
 def replace_with_random_person(line, person_code):
-    sex = random.choice(sexes)
-    age = random.choice(ages)
-    ethnicity = random.choice(ethnicities)
+    sex = random.choice(SEXES)
+    age = random.choice(AGES)
+    ethnicity = random.choice(ETHNICITIES)
     if age == "5-year-old":
-        sex = sex_young[sex]
+        sex = SEX_YOUNG[sex]
     if person_code not in line:
         raise ValueError(f"Person code {person_code} not found in line")
     line = line.replace(person_code, f"{age} {ethnicity} {sex}")

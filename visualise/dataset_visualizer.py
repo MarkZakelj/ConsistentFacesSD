@@ -29,7 +29,7 @@ colors = ["red", "green", "blue", "black"]
 def draw_bounding_box(image, face_infos):
     draw = ImageDraw.Draw(image)
     for i, info in enumerate(face_infos):
-        bbox = info['bbox']
+        bbox = info["bbox"]
         draw.rectangle(bbox, outline=colors[i % len(colors)], width=3)
     return image
 
@@ -41,16 +41,23 @@ def main():
 
     # Image limit selection (applies to all columns)
     image_limit = st.sidebar.selectbox(
-        "Number of images to display per column",
-        [10, 50, 100],
-        key="image_limit"
+        "Number of images to display per column", [10, 50, 100], key="image_limit"
     )
 
     # Pagination control (applies to all columns)
-    total_images = max(len(files) for files in [
-        sorted([f for f in os.listdir(os.path.join(config[dataset], "images")) if f.endswith(".jpg")])
-        for dataset in config.keys()
-    ])
+    total_images = max(
+        len(files)
+        for files in [
+            sorted(
+                [
+                    f
+                    for f in os.listdir(os.path.join(config[dataset], "images"))
+                    if f.endswith(".jpg")
+                ]
+            )
+            for dataset in config.keys()
+        ]
+    )
     max_page = (total_images - 1) // image_limit
     page_number = st.sidebar.number_input(
         "Select page",
@@ -58,7 +65,7 @@ def main():
         max_value=max_page,
         value=0,
         step=1,
-        key="page_number"
+        key="page_number",
     )
 
     # Create columns based on user selection
@@ -119,12 +126,12 @@ def main():
                     if os.path.exists(json_path):
                         try:
                             img_info = load_json(json_path)
-                        except json.decoder.JSONDecodeError as e:
+                        except json.decoder.JSONDecodeError:
                             print(json_path)
                             raise ValueError
 
                     if show_bboxes and "face_info" in img_info:
-                        img = draw_bounding_box(img, img_info['face_info'])
+                        img = draw_bounding_box(img, img_info["face_info"])
 
                     with st.container():
                         st.image(img, use_column_width=True)

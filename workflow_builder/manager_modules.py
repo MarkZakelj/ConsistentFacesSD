@@ -44,6 +44,28 @@ class BasicManager(Manager):
     def set_cfg(self, cfg: float):
         self.workflow["KSampler0"]["inputs"]["cfg"] = cfg
 
+    def set_all(
+        self,
+        width: int,
+        height: int,
+        batch_size: int,
+        prompt: str,
+        negative_prompt: str,
+        checkpoint: str,
+        seed: int,
+        steps: int,
+        cfg: float,
+    ):
+        self.set_width(width)
+        self.set_height(height)
+        self.set_batch_size(batch_size)
+        self.set_prompt(prompt)
+        self.set_negative_prompt(negative_prompt)
+        self.set_checkpoint(checkpoint)
+        self.set_seed(seed)
+        self.set_steps(steps)
+        self.set_cfg(cfg)
+
 
 LoadImageNodeType = Literal["base64", "normal"]
 

@@ -88,8 +88,10 @@ def get_number_of_images(subset_name: str):
     return count_images_in_dir(os.path.join(sub_dir, "images"))
 
 
-def image_exists(subset_name: str, img_num: int):
+def image_exists(subset_name: str, img_id: int | str):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
-    img_path = os.path.join(sub_dir, "images", prepare_number(img_num) + ".jpg")
-    info_path = os.path.join(sub_dir, "img_info", prepare_number(img_num) + ".json")
+    if isinstance(img_id, int):
+        img_id = prepare_number(img_id)
+    img_path = os.path.join(sub_dir, "images", img_id + ".jpg")
+    info_path = os.path.join(sub_dir, "img_info", img_id + ".json")
     return os.path.exists(img_path) and os.path.exists(info_path)

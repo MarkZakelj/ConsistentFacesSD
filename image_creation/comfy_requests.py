@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import uuid
 from io import BytesIO
 
 import requests
@@ -10,6 +11,7 @@ from loguru import logger
 from PIL import Image
 
 from utils import SequentialTimer, get_exception_traceback_str
+from workflow_builder.full_manager import FullManager
 
 load_dotenv()
 
@@ -85,3 +87,10 @@ async def comfy_send_request(payload, req_id):
             error=str(get_exception_traceback_str(e)),
         )
     return imgs, timings
+
+
+async def send_workflow_to_comfy(workflow: FullManager):
+    req_id = str(uuid.uuid4())
+    p = {"prompt": workflow.get_workflow(), "client_id": req_id}
+    imgs, timings = await comfy_send_request(p, req_id)
+    return imgs
