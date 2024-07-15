@@ -6,10 +6,11 @@ from itertools import product
 
 from prompt_construction import AGES, ETHNICITIES, SEX_YOUNG, SEXES
 from tqdm import tqdm
+
 from image_creation.comfy_requests import send_workflow_to_comfy
+from utils.imgs import image_exists
 from utils.paths import OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
-from utils.imgs import image_exists
 
 random.seed(42)
 
@@ -49,7 +50,9 @@ async def main():
         open(os.path.join(img_save_path, "info.json"), "w"),
         indent=2,
     )
-    pbar = tqdm(total=len(SEXES) * len(AGES) * len(ETHNICITIES), desc="Generating images")
+    pbar = tqdm(
+        total=len(SEXES) * len(AGES) * len(ETHNICITIES), desc="Generating images"
+    )
     for sex, age, ethnicity in product(SEXES, AGES, ETHNICITIES):
         img_filename = get_id_code(sex, age, ethnicity)
         seed = random.randint(0, 99999999999)
