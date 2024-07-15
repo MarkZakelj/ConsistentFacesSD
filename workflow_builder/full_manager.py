@@ -11,6 +11,7 @@ from .manager_modules import (
     LoadImageManager,
     PoseManager,
     PoseMaskManager,
+    SingleCharacterManager,
 )
 from .nodes import FaceBoundingBox, FaceDetailer, ImageResize, LoraLoaderStack, Manager
 from .workflow_utils import load_workflow, trim_workflow
@@ -48,7 +49,7 @@ class FullManager(Manager):
 class TextToImageWorkflowManager(FullManager):
     def __init__(self, features=None):
         super().__init__()
-        possible_features = {"lora", "face", "pose", "nsfw_skip"}
+        possible_features = {"lora", "face", "pose", "character"}
         if features is None:
             features = []
         # check validity of features
@@ -64,6 +65,9 @@ class TextToImageWorkflowManager(FullManager):
         # initialize the composed managers (composition ftw)
         self.basic: BasicManager = BasicManager(workflow=self.workflow)
         self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
+        self.character: SingleCharacterManager = SingleCharacterManager(
+            workflow=self.workflow, unique_name="Face"
+        )
         self.face: FaceDetailer = FaceDetailer(workflow=self.workflow)
         self.pose: PoseManager = PoseManager(workflow=self.workflow)
 
@@ -72,6 +76,10 @@ class TextToImageWorkflowManager(FullManager):
             wfu.skip_node(
                 "LoraLoaderStack(rgthree)0", [("model", 0), ("clip", 1)], self.workflow
             )
+
+        if "character" not in features:
+            wfu.skip_node("IPAdapterAdvancedFace0", [("model", 0)], self.workflow)
+            wfu.skip_node("IPAdapterUnifiedLoader0", [("model", 0)], self.workflow)
 
         if "face" not in features:
             wfu.skip_node("FaceDetailer0", [("image", 0)], self.workflow)

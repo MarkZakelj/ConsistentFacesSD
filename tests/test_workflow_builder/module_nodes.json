@@ -1,0 +1,67 @@
+{
+  "basic": [
+    "Seed(rgthree)0",
+    "EmptyLatentImage0",
+    "Width0",
+    "Height0",
+    "LoadCheckpoint0",
+    "CLIPTextEncode(Prompt)Negative0",
+    "CLIPTextEncode(Prompt)Positive0",
+    "KSampler0",
+    "VAEDecode0",
+    "SendImage(WebSocket)0"
+  ],
+  "lora": [
+    "LoraLoaderStack(rgthree)0"
+  ],
+  "pose": [
+    "LoadControlNetModel0",
+    "ApplyControlNet(Advanced)0",
+    "LoadPosesJSON0",
+    "FilterPoses0"
+  ],
+  "character": [
+    "IPAdapterAdvancedFace0",
+    "IPAdapterUnifiedLoader0",
+    "LoadImageFace0"
+  ],
+  "face": [
+    "FaceDetailer0",
+    "UltralyticsDetectorProvider0"
+  ],
+  "multiple_chars": [
+    "IPAdapterModelLoader0",
+    "LoadCLIPVision0",
+    "MaskFromPoints0"
+  ],
+  "pose_gen": [
+    "CLIPTextEncode(Prompt)PositivePose0",
+    "LoadControlNetModel0",
+    "ApplyControlNet(Advanced)0",
+    "KSamplerPose0",
+    "DWPoseEstimator0",
+    "VAEDecode1"
+  ],
+  "p0": [
+    "IPAdapterAdvanced00",
+    "IPAdapterAdvancedFace00",
+    "LoadImageIP00",
+    "FaceDetailer00",
+    "UltralyticsDetectorProvider0"
+  ],
+  "p1": [
+    "IPAdapterAdvanced10",
+    "IPAdapterAdvancedFace10",
+    "LoadImageIP10",
+    "FaceDetailer10",
+    "FaceAnalysisModels0",
+    "FaceBoundingBox0",
+    "FaceMatcher0",
+    "MakeImageList0"
+  ],
+  "mc_pose": [
+    "ApplyControlNet(Advanced)PreGen0",
+    "FilterPoses0",
+    "LoadPosesJSON0"
+  ]
+}

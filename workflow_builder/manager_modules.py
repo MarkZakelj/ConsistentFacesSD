@@ -5,7 +5,7 @@ from typing import Literal
 
 from workflow_builder import workflow_utils as wfu
 from workflow_builder.errors import CharacterIdNotInRangeError
-from workflow_builder.nodes import ApplyControlnet, IPAdapterFaceID, Manager
+from workflow_builder.nodes import ApplyControlnet, IPAdapter, IPAdapterFaceID, Manager
 from workflow_builder.workflow_utils import is_image_filename
 
 MAX_CHARACTERS = 2  # maximum number of characters that can be used in the multiple character workflow
@@ -136,12 +136,12 @@ class ImageLoadSwitcher(Manager):
 
 
 class LoadImageManager(Manager):
-    def __init__(self, workflow: dict, special_name="", number=0):
+    def __init__(self, workflow: dict, unique_name="", number=0):
         super().__init__(workflow)
         self.image_load_switcher = ImageLoadSwitcher(
             workflow,
-            f"LoadImage(Base64){special_name}{number}",
-            f"LoadImage{special_name}{number}",
+            f"LoadImage(Base64){unique_name}{number}",
+            f"LoadImage{unique_name}{number}",
         )
 
     def set_image(self, image: str):
@@ -170,6 +170,29 @@ def check_character_id(func):
         return func(self, *args, **kwargs)
 
     return wrapper
+
+
+class SingleCharacterManager(Manager):
+    def __init__(self, workflow: dict, unique_name: str = ""):
+        super().__init__(workflow)
+
+        self.load_image = LoadImageManager(workflow, unique_name)
+        self.ip_adapter = IPAdapter(workflow, f"IPAdapterAdvanced{unique_name}0")
+
+    def set_image(self, *args, **kwargs):
+        self.load_image.set_image(*args, **kwargs)
+
+    def set_weight(self, *args, **kwargs):
+        self.ip_adapter.set_weight(*args, **kwargs)
+
+    def set_weight_type(self, *args, **kwargs):
+        self.ip_adapter.set_weight_type(*args, **kwargs)
+
+    def set_start_at(self, *args, **kwargs):
+        self.ip_adapter.set_start_at(*args, **kwargs)
+
+    def set_end_at(self, *args, **kwargs):
+        self.ip_adapter.set_end_at(*args, **kwargs)
 
 
 class CharactersManager(Manager):
@@ -225,7 +248,7 @@ class CharactersManagerFaceID(Manager):
         """
         super().__init__(workflow)
         self.image_loaders = [
-            LoadImageManager(workflow, special_name=f"Face{i}")
+            LoadImageManager(workflow, unique_name=f"Face{i}")
             for i in range(MAX_CHARACTERS)
         ]
         self.ip_adapters = [

@@ -6,7 +6,7 @@ Using those nodes, we can model the exact workflow used inside comfy and enable 
 class Manager:
     """Base class for all managers, contains the workflow dictionary"""
 
-    def __init__(self, workflow=None):
+    def __init__(self, workflow: dict = None):
         if workflow is None:
             workflow = {}
         self.workflow: dict = workflow
@@ -76,7 +76,7 @@ class LoraLoaderStack(Manager):
 
 
 class IPAdapter(Manager):
-    def __init__(self, workflow, keyname):
+    def __init__(self, workflow: dict, keyname: str):
         super().__init__(workflow)
         self.keyname = keyname
 
