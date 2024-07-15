@@ -32,6 +32,14 @@ def call_face(wm):
     wm.face.set_cfg(1.34)
 
 
+def call_character(wm: TextToImageWorkflowManager):
+    wm.character.set_image("image1.png")
+    wm.character.set_weight(0.5)
+    wm.character.set_weight_type("ease out")
+    wm.character.set_start_at(0.2)
+    wm.character.set_end_at(0.8)
+
+
 class TestWorkflowValueSetKeyExist:
     """
     tries to use the methods to set values in the workflow, to see, if the keys exist in the workflow
@@ -60,10 +68,17 @@ class TestWorkflowValueSetKeyExist:
         call_basic(wm)
         call_face(wm)
 
+    def test_character(self):
+        wm = TextToImageWorkflowManager(["character"])
+        wm.trim_workflow()
+        call_basic(wm)
+        call_character(wm)
+
     def test_all(self):
-        wm = TextToImageWorkflowManager(["lora", "pose", "face"])
+        wm = TextToImageWorkflowManager(["lora", "pose", "face", "character"])
         wm.trim_workflow()
         call_basic(wm)
         call_lora(wm)
         call_pose(wm)
         call_face(wm)
+        call_character(wm)
