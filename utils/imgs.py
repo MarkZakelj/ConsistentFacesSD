@@ -9,8 +9,10 @@ from PIL import Image
 from utils.paths import OUTPUT_DIR
 
 
-def prepare_number(num: int):
-    return f"{num:08d}"
+def prepare_img_code(img_code: int | str):
+    if isinstance(img_code, str):
+        return img_code
+    return f"{img_code:08d}"
 
 
 def img_2_base64(image: Image.Image) -> str:
@@ -35,12 +37,14 @@ def read_base64_image(path: str, as_image=False) -> str | Image.Image:
     return base64_string
 
 
-def resize_image(image: Image.Image, new_size: int) -> Image.Image:
-    original_size = min(image.size)
-    if original_size <= new_size:
-        return image
-    k = new_size / original_size
-    return image.resize((int(image.width * k), int(image.height * k)), Image.LANCZOS)
+def get_img_paths_in_dir(directory):
+    types = (".jpg", ".png", ".jpeg")  # the tuple of file types
+    img_paths = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(types):
+                img_paths.append(os.path.join(root, file))
+    return img_paths
 
 
 def count_images_in_dir(directory):
@@ -53,32 +57,32 @@ def count_images_in_dir(directory):
     return count
 
 
-def get_img_info(subset_name: str, img_num: int):
+def get_img_info(subset_name: str, img_code: int):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     info = json.load(
-        open(os.path.join(sub_dir, "img_info", prepare_number(img_num) + ".json"))
+        open(os.path.join(sub_dir, "img_info", prepare_img_code(img_code) + ".json"))
     )
     return info
 
 
-def get_img(subset_name: str, img_num: int):
+def get_img(subset_name: str, img_code: int | str):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
-    img_path = os.path.join(sub_dir, "images", prepare_number(img_num) + ".jpg")
+    img_path = os.path.join(sub_dir, "images", prepare_img_code(img_code) + ".jpg")
     img = cv2.imread(img_path)[..., [2, 1, 0]]
     return img
 
 
-def get_image_and_info(subset_name: str, img_num: int):
-    img = get_img(subset_name, img_num)
-    info = get_img_info(subset_name, img_num)
+def get_image_and_info(subset_name: str, img_code: int | str):
+    img = get_img(subset_name, img_code)
+    info = get_img_info(subset_name, img_code)
     return img, info
 
 
-def update_img_info(subset_name: str, img_num: int, info_update: dict):
-    info = get_img_info(subset_name, img_num)
+def update_img_info(subset_name: str, img_code: int | str, info_update: dict):
+    info = get_img_info(subset_name, img_code)
     info = info | info_update
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
-    info_path = os.path.join(sub_dir, "img_info", prepare_number(img_num) + ".json")
+    info_path = os.path.join(sub_dir, "img_info", prepare_img_code(img_code) + ".json")
     with open(info_path, "w") as f:
         json.dump(info, f, indent=2)
 
@@ -88,10 +92,19 @@ def get_number_of_images(subset_name: str):
     return count_images_in_dir(os.path.join(sub_dir, "images"))
 
 
-def image_exists(subset_name: str, img_id: int | str):
+def get_image_paths(subset_name: str, img_folder: str = "images"):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
-    if isinstance(img_id, int):
-        img_id = prepare_number(img_id)
-    img_path = os.path.join(sub_dir, "images", img_id + ".jpg")
-    info_path = os.path.join(sub_dir, "img_info", img_id + ".json")
+    return get_img_paths_in_dir(os.path.join(sub_dir, img_folder))
+
+
+def image_exists(subset_name: str, img_code: int | str):
+    sub_dir = os.path.join(OUTPUT_DIR, subset_name)
+    if isinstance(img_code, int):
+        img_code = prepare_img_code(img_code)
+    img_path = os.path.join(sub_dir, "images", img_code + ".jpg")
+    info_path = os.path.join(sub_dir, "img_info", img_code + ".json")
     return os.path.exists(img_path) and os.path.exists(info_path)
+
+
+def resize_img(img: Image.Image, new_width: int, new_height: int):
+    return img.resize((new_width, new_height), Image.Resampling.LANCZOS)
