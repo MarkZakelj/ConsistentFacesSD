@@ -39,6 +39,7 @@ configs: dict[str, dict[str, str]] = {
 
 
 async def generate_dataset(config_name: str):
+    random.seed(42)
     conf = configs[config_name]
     raw_prompts_path = os.path.join(DATA_DIR, conf["raw_prompts"])
     lines = process_file(raw_prompts_path)
@@ -71,17 +72,19 @@ async def generate_dataset(config_name: str):
     for i, line in enumerate(lines):
         for j in range(NSEEDS):
             img_num = i * NSEEDS + j
-            if image_exists(config_name, img_num):
-                pbar.update(1)
-                continue
             prompt = line
             for person_code in conf["person_codes"]:
                 prompt = replace_with_random_person(prompt, person_code)
             pbar.set_description(
                 f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
             )
-
             seed = random.randint(0, 9999999999999)
+
+            # make sure to execute all random calls first to keep randomness consistent
+            if image_exists(config_name, img_num):
+                pbar.update(1)
+                continue
+
             img_info = {"prompt": prompt, "seed": seed}
 
             wf = TextToImageWorkflowManager()

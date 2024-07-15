@@ -80,7 +80,7 @@ def update_img_info(subset_name: str, img_num: int, info_update: dict):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     info_path = os.path.join(sub_dir, "img_info", prepare_number(img_num) + ".json")
     with open(info_path, "w") as f:
-        json.dump(info, f)
+        json.dump(info, f, indent=2)
 
 
 def get_number_of_images(subset_name: str):
