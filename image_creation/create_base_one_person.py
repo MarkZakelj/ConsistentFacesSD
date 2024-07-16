@@ -35,6 +35,24 @@ configs: dict[str, dict[str, Any]] = {
         "features": ["character"],
         "character": {"weight": 0.5},
     },
+    "ip_one_person_wp25": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "features": ["character"],
+        "character": {"weight": 0.25},
+    },
+    "ip_one_person_wp5_sp35": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "features": ["character"],
+        "character": {"weight": 0.5, "start_at": 0.35},
+    },
+    "ip_one_person_wp5_sp2": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "features": ["character"],
+        "character": {"weight": 0.5, "start_at": 0.2},
+    },
     "base_one_person_dreamshaper": {
         "raw_prompts": "raw_prompts.txt",
         "person_codes": ["PERSON1"],

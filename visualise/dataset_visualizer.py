@@ -13,6 +13,8 @@ config = {
     for setname in list_directories_in_directory(OUTPUT_DIR)
 }
 
+st.set_page_config(layout="wide")
+
 
 def load_image(image_path):
     return Image.open(image_path)

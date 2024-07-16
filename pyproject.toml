@@ -1,5 +1,5 @@
 [tool.ruff]
-lint.ignore = ["E501", "E211"]
+lint.ignore = ["E501", "E211", "F841"]
 line-length = 9999
 lint.per-file-ignores = {"__init__.py" = ["F401"]}
 select = ["E", "F", "W"]
