@@ -4,28 +4,16 @@ import os
 import random
 from itertools import product
 
-from prompt_construction import AGES, ETHNICITIES, SEX_YOUNG, SEXES
+from prompt_construction import AGES, ETHNICITIES, SEXES
 from tqdm import tqdm
 
 from image_creation.comfy_requests import send_workflow_to_comfy
+from image_creation.prompt_construction import construct_mugshot_prompt, get_id_code
 from utils.imgs import image_exists
 from utils.paths import OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
 random.seed(42)
-
-
-def construct_mugshot_prompt(sex, age, ethnicity):
-    if age == "5-year-old":
-        sex = SEX_YOUNG[sex]
-    return f"mugshot of a {age} {ethnicity} {sex}, detailed, high quality, full face photo, realistic, front facing, neutral background"
-
-
-def get_id_code(sex, age, ethnicity):
-    age_code = age.split("-")[0]
-    sex_code = sex[:3]
-    ethnicity_code = ethnicity[:3]
-    return f"{age_code}-{ethnicity_code}-{sex_code}"
 
 
 async def main():

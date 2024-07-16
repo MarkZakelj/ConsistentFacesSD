@@ -3,12 +3,14 @@ import json
 import os
 import random
 import uuid
+from typing import Any
 
 from comfy_requests import comfy_send_request
+from PIL import Image
 from prompt_construction import process_file, replace_with_random_person
 from tqdm import tqdm
 
-from utils.imgs import image_exists
+from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
@@ -16,10 +18,22 @@ random.seed(42)
 
 NSEEDS = 5
 
-configs: dict[str, dict[str, str]] = {
+configs: dict[str, dict[str, Any]] = {
     "base_one_person": {
         "raw_prompts": "raw_prompts.txt",
         "person_codes": ["PERSON1"],
+    },
+    "ip_one_person": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "features": ["character"],
+        "character": {"weight": 1.0},
+    },
+    "ip_one_person_wp5": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "features": ["character"],
+        "character": {"weight": 0.5},
     },
     "base_one_person_dreamshaper": {
         "raw_prompts": "raw_prompts.txt",
@@ -62,7 +76,7 @@ async def generate_dataset(config_name: str):
             "negative_prompt",
             "weird, ugly, deformed, low contrast, bad anatomy, disfigured",
         ),
-    }
+    } | conf
     print("INFO:")
     print(json.dumps(info, indent=2))
     json.dump(info, open(os.path.join(img_save_path, "info.json"), "w"), indent=2)
@@ -73,8 +87,9 @@ async def generate_dataset(config_name: str):
         for j in range(NSEEDS):
             img_num = i * NSEEDS + j
             prompt = line
+            person_id_code = None
             for person_code in conf["person_codes"]:
-                prompt = replace_with_random_person(prompt, person_code)
+                prompt, person_id_code = replace_with_random_person(prompt, person_code)
             pbar.set_description(
                 f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
             )
@@ -86,8 +101,8 @@ async def generate_dataset(config_name: str):
                 continue
 
             img_info = {"prompt": prompt, "seed": seed}
-
-            wf = TextToImageWorkflowManager()
+            features = conf.get("features", [])
+            wf = TextToImageWorkflowManager(features=features)
             wf.basic.set_prompt(prompt)
             wf.basic.set_seed(seed)
 
@@ -98,7 +113,28 @@ async def generate_dataset(config_name: str):
             wf.basic.set_steps(info["steps"])
             wf.basic.set_checkpoint(info["checkpoint"])
 
+            if "character" in features:
+                img_info["character"] = {"code": person_id_code}
+                profile_image = Image.open(
+                    os.path.join(
+                        OUTPUT_DIR,
+                        "identities",
+                        "images_224x224",
+                        f"{person_id_code}.png",
+                    )
+                )
+                wf.character.set_image(img_2_base64(profile_image))
+                character = conf["character"]
+                wf.character.set_weight(character.get("weight", 1.0))
+                wf.character.set_end_at(character.get("end_at", 1.0))
+                wf.character.set_start_at(character.get("start_at", 0.0))
+                wf.character.set_weight_type(character.get("weight_type", "linear"))
+
             wf.trim_workflow()
+
+            if img_num == 0:
+                print(json.dumps(wf.get_workflow(), indent=2))
+
             req_id = str(uuid.uuid4())
             p = {"prompt": wf.get_workflow(), "client_id": req_id}
             imgs, timings = await comfy_send_request(p, req_id)
