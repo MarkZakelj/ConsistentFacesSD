@@ -522,6 +522,7 @@ else:
     ONNX_PROVIDERS = [
         "CUDAExecutionProvider",
         "DirectMLExecutionProvider",
+        # 'CoreMLExecutionProvider',
         "OpenVINOExecutionProvider",
         "ROCMExecutionProvider",
         "CPUExecutionProvider",

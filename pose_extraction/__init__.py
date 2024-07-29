@@ -2,7 +2,7 @@ import json
 
 import torch.backends.mps
 
-from .dwpose import DwposeDetector
+from pose_extraction.dwpose import DwposeDetector
 
 bbox_detector = [
     "yolox_l.torchscript.pt",

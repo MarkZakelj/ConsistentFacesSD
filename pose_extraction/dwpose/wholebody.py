@@ -48,6 +48,7 @@ class Wholebody:
             cv2.dnn.DNN_TARGET_CPU if cv2_device == "cpu" else cv2.dnn.DNN_TARGET_CUDA
         )
         ort_providers = get_ort_providers()
+        print(ort_providers)
 
         if self.det_model_type is None:
             pass
@@ -107,13 +108,16 @@ class Wholebody:
         if self.pose_filename is not None:
             self.pose_input_size, _ = guess_onnx_input_shape_dtype(self.pose_filename)
 
-    def __call__(self, oriImg) -> Optional[np.ndarray]:
+    def __call__(self, oriImg, verbose=True) -> Optional[np.ndarray]:
         import torch.utils.benchmark.utils.timer as torch_timer
 
         if is_model_torchscript(self.det):
             det_start = torch_timer.timer()
             det_result = inference_jit_yolox(self.det, oriImg, detect_classes=[0])
-            print(f"DWPose: Bbox {((torch_timer.timer() - det_start) * 1000):.2f}ms")
+            if verbose:
+                print(
+                    f"DWPose: Bbox {((torch_timer.timer() - det_start) * 1000):.2f}ms"
+                )
         else:
             det_start = default_timer()
             if "yolox" in self.det_filename:
@@ -125,7 +129,8 @@ class Wholebody:
                 det_result = inference_onnx_yolo_nas(
                     self.det, oriImg, detect_classes=[0], dtype=np.uint8
                 )
-            print(f"DWPose: Bbox {((default_timer() - det_start) * 1000):.2f}ms")
+            if verbose:
+                print(f"DWPose: Bbox {((default_timer() - det_start) * 1000):.2f}ms")
         if (det_result is None) or (det_result.shape[0] == 0):
             return None
 
@@ -134,9 +139,10 @@ class Wholebody:
             keypoints, scores = inference_jit_pose(
                 self.pose, det_result, oriImg, self.pose_input_size
             )
-            print(
-                f"DWPose: Pose {((torch_timer.timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n"
-            )
+            if verbose:
+                print(
+                    f"DWPose: Pose {((torch_timer.timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n"
+                )
         else:
             pose_start = default_timer()
             _, pose_onnx_dtype = guess_onnx_input_shape_dtype(self.pose_filename)
@@ -147,9 +153,10 @@ class Wholebody:
                 self.pose_input_size,
                 dtype=pose_onnx_dtype,
             )
-            print(
-                f"DWPose: Pose {((default_timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n"
-            )
+            if verbose:
+                print(
+                    f"DWPose: Pose {((default_timer() - pose_start) * 1000):.2f}ms on {det_result.shape[0]} people\n"
+                )
 
         keypoints_info = np.concatenate((keypoints, scores[..., None]), axis=-1)
         # compute neck joint

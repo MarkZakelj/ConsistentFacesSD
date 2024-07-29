@@ -4,6 +4,7 @@ import os
 from io import BytesIO
 
 import cv2
+import numpy as np
 from PIL import Image
 
 from utils.paths import OUTPUT_DIR
@@ -72,6 +73,13 @@ def get_img(subset_name: str, img_code: int | str):
     return img
 
 
+def get_img2(subset_name: str, img_code: int | str):
+    sub_dir = os.path.join(OUTPUT_DIR, subset_name)
+    img_path = os.path.join(sub_dir, "images", prepare_img_code(img_code) + ".jpg")
+    img = Image.open(img_path)
+    return np.ascontiguousarray(img, dtype=np.uint8)
+
+
 def get_image_and_info(subset_name: str, img_code: int | str):
     img = get_img(subset_name, img_code)
     info = get_img_info(subset_name, img_code)
@@ -108,3 +116,16 @@ def image_exists(subset_name: str, img_code: int | str):
 
 def resize_img(img: Image.Image, new_width: int, new_height: int):
     return img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+
+def get_img_width_height(img: Image.Image | np.ndarray) -> tuple[int, int]:
+    """
+    :param img: image to get width and height from
+    :return: width, height
+    """
+    if isinstance(img, Image.Image):
+        return img.size
+    elif isinstance(img, np.ndarray):
+        return img.shape[1], img.shape[0]
+    else:
+        raise TypeError("Input must be either a PIL Image or a numpy array")

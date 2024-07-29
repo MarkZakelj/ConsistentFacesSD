@@ -192,7 +192,7 @@ def decode_json_as_poses(
 
 def encode_poses_as_dict(
     poses: List[PoseResult], canvas_height: int, canvas_width: int
-) -> str:
+):
     """Encode the pose as a dict following openpose JSON output format:
     https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/02_output.md
     """
@@ -282,9 +282,9 @@ class DwposeDetector:
             global_cached_dwpose = t
         return cls(global_cached_dwpose)
 
-    def detect_poses(self, oriImg) -> List[PoseResult]:
+    def detect_poses(self, oriImg, **kwargs) -> List[PoseResult]:
         with torch.no_grad():
-            keypoints_info = self.dw_pose_estimation(oriImg.copy())
+            keypoints_info = self.dw_pose_estimation(oriImg.copy(), **kwargs)
             return Wholebody.format_result(keypoints_info)
 
     def __call__(
