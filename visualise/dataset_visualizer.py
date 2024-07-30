@@ -1,9 +1,12 @@
 import json
 import os
 
+import numpy as np
 import streamlit as st
 from PIL import Image, ImageDraw
 
+from pose_extraction.dwpose import decode_json_as_poses
+from pose_extraction.dwpose.util import draw_bodypose, draw_facepose
 from utils import list_directories_in_directory
 from utils.paths import OUTPUT_DIR
 
@@ -34,6 +37,15 @@ def draw_bounding_box(image, face_infos):
         bbox = info["bbox"]
         draw.rectangle(bbox, outline=colors[i % len(colors)], width=3)
     return image
+
+
+def draw_poses(image, pose_infos):
+    poses, _, _, _ = decode_json_as_poses(pose_infos)
+    canvas = np.array(image)
+    for pose in poses:
+        canvas = draw_bodypose(canvas, pose.body.keypoints)
+        canvas = draw_facepose(canvas, pose.face)
+    return Image.fromarray(canvas)
 
 
 def main():
@@ -94,6 +106,10 @@ def main():
                 f"Show face bounding boxes for column {i + 1}", key=f"show_bboxes_{i}"
             )
 
+            show_poses = st.checkbox(
+                f"Show poses for column {i + 1}", key=f"show_poses_{i}"
+            )
+
             if dataset:
                 dataset_path = config[dataset]
                 images_path = os.path.join(dataset_path, "images")
@@ -134,6 +150,9 @@ def main():
 
                     if show_bboxes and "face_info" in img_info:
                         img = draw_bounding_box(img, img_info["face_info"])
+
+                    if show_poses and "pose_info" in img_info:
+                        img = draw_poses(img, img_info["pose_info"])
 
                     with st.container():
                         st.image(img, use_column_width=True)
