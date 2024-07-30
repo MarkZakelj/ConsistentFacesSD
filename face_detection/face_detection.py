@@ -14,6 +14,8 @@ FORCE = False
 app = FaceAnalysis(allowed_modules=["detection"])
 app.prepare(ctx_id=0, det_size=(640, 640))
 
+skip_subsets = ["identities"]
+
 
 def detect_face(img):
     faces = app.get(img, max_num=4)
@@ -24,6 +26,8 @@ def detect_face(img):
 
 
 def detect_all_faces_on_subset(subset_name: str):
+    if subset_name in skip_subsets:
+        return
     logger.info("SUBSET NAME: " + subset_name)
 
     n_images = get_number_of_images(subset_name)
@@ -35,7 +39,7 @@ def detect_all_faces_on_subset(subset_name: str):
         face_infos = detect_face(img)
         if face_infos is None:
             continue
-        if FORCE:
+        if "face_info" not in info or FORCE:
             info["face_info"] = []
         for face_info in face_infos:
             face_info.bbox = face_info.bbox.astype(np.int32).tolist()
