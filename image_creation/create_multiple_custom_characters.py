@@ -10,7 +10,7 @@ from PIL import Image
 from prompt_construction import process_file
 from tqdm import tqdm
 
-from utils.imgs import img_2_base64
+from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import MultipleCharactersFaceIdWorkflowManager
 
@@ -84,9 +84,9 @@ async def generate_dataset(config_name: str):
             seed = prompt_seed_pairs[img_num]["seed"]
 
             # make sure to execute all random calls first to keep randomness consistent
-            # if image_exists(config_name, img_num):
-            #     pbar.update(1)
-            #     continue
+            if image_exists(config_name, img_num):
+                pbar.update(1)
+                continue
 
             img_info = {"prompt": prompt, "seed": seed}
             # wf = TwoCharactersFaceIdWorkflowManager()

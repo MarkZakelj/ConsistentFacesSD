@@ -159,8 +159,7 @@ def get_full_img_path(subset_name: str, img_code: int | str):
 
 def image_exists(subset_name: str, img_code: int | str):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
-    if isinstance(img_code, int):
-        img_code = prepare_img_code(img_code)
+    img_code = prepare_img_code(img_code)
     img_path = os.path.join(sub_dir, "images", img_code + ".jpg")
     info_path = os.path.join(sub_dir, "img_info", img_code + ".json")
     return os.path.exists(img_path) and os.path.exists(info_path)

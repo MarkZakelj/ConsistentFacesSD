@@ -10,7 +10,7 @@ from PIL import Image
 from prompt_construction import process_file
 from tqdm import tqdm
 
-from utils.imgs import img_2_base64
+from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
@@ -67,6 +67,11 @@ configs: dict[str, dict[str, Any]] = {
         "raw_prompts": "raw_prompts_two.txt",
         "person_codes": ["PERSON1", "PERSON2"],
     },
+    "base_three_people_dreamshaper": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+    },
 }
 
 
@@ -110,10 +115,15 @@ async def generate_dataset(config_name: str):
             img_num = i * NSEEDS + j
             prompt = prompt_seed_pairs[img_num]["prompt"]
             person_id_codes = list(prompt_seed_pairs[img_num]["people"].values())
+
             pbar.set_description(
                 f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
             )
             seed = prompt_seed_pairs[img_num]["seed"]
+
+            if image_exists(config_name, img_num):
+                pbar.update(1)
+                continue
 
             img_info = {"prompt": prompt, "seed": seed}
             features = conf.get("features", [])
