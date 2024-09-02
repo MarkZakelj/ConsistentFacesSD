@@ -125,13 +125,13 @@ async def generate_dataset(config_name: str):
 
             req_id = str(uuid.uuid4())
             p = {"prompt": wf.get_workflow(), "client_id": req_id}
-            prompt_seed_pairs.append(
-                {
-                    "prompt": prompt,
-                    "seed": seed,
-                    "people": dict(zip(conf["person_codes"], person_id_codes)),
-                }
-            )
+            # prompt_seed_pairs.append(
+            #     {
+            #         "prompt": prompt,
+            #         "seed": seed,
+            #         "people": dict(zip(conf["person_codes"], person_id_codes)),
+            #     }
+            # )
             imgs, timings = await comfy_send_request(p, req_id)
 
             img = imgs[0]
@@ -153,11 +153,11 @@ async def generate_dataset(config_name: str):
 
             pbar.update(1)
     pbar.close()
-    json.dump(
-        prompt_seed_pairs,
-        open(os.path.join(img_save_path, "prompt_seed_pairs.json"), "w"),
-        indent=2,
-    )
+    # json.dump(
+    #     prompt_seed_pairs,
+    #     open(os.path.join(img_save_path, "prompt_seed_pairs.json"), "w"),
+    #     indent=2,
+    # )
 
 
 async def main():

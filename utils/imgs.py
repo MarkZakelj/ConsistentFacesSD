@@ -58,7 +58,7 @@ def count_images_in_dir(directory):
     return count
 
 
-def get_img_info(subset_name: str, img_code: int):
+def get_img_info(subset_name: str, img_code: int | str):
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     info = json.load(
         open(os.path.join(sub_dir, "img_info", prepare_img_code(img_code) + ".json"))
@@ -254,3 +254,12 @@ def pad_bbox(bbox, img_shape, pad=0.2):
     bbox_new[2] = min(bbox[2] + pad_x, img_shape[1])
     bbox_new[3] = min(bbox[3] + pad_y, img_shape[0])
     return bbox_new
+
+
+def get_bbox_size(bbox):
+    """
+    Get the size of the bounding box.
+    :param bbox: [x1, y1, x2, y2] - upper left and bottom right corners of the bounding box
+    :return: size: int - size of the bounding box in pixels
+    """
+    return (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])

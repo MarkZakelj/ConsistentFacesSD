@@ -7,10 +7,10 @@ from typing import Any
 
 from comfy_requests import comfy_send_request
 from PIL import Image
-from prompt_construction import process_file, replace_with_random_person
+from prompt_construction import process_file
 from tqdm import tqdm
 
-from utils.imgs import image_exists, img_2_base64
+from utils.imgs import img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
 
@@ -100,30 +100,28 @@ async def generate_dataset(config_name: str):
     json.dump(info, open(os.path.join(img_save_path, "info.json"), "w"), indent=2)
 
     pbar = tqdm(total=total_images, desc="Generating images")
+    n_people = len(conf["person_codes"])
+    prompt_seed_pairs = json.load(
+        open(os.path.join(DATA_DIR, f"prompt_seed_pairs_{n_people}.json"), "r")
+    )
 
     for i, line in enumerate(lines):
         for j in range(NSEEDS):
             img_num = i * NSEEDS + j
-            prompt = line
-            person_id_code = None
-            for person_code in conf["person_codes"]:
-                prompt, person_id_code = replace_with_random_person(prompt, person_code)
+            prompt = prompt_seed_pairs[img_num]["prompt"]
+            person_id_codes = list(prompt_seed_pairs[img_num]["people"].values())
             pbar.set_description(
                 f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
             )
-            seed = random.randint(0, 9999999999999)
-
-            # make sure to execute all random calls first to keep randomness consistent
-            if image_exists(config_name, img_num):
-                pbar.update(1)
-                continue
+            seed = prompt_seed_pairs[img_num]["seed"]
 
             img_info = {"prompt": prompt, "seed": seed}
             features = conf.get("features", [])
+
             wf = TextToImageWorkflowManager(features=features)
+
             wf.basic.set_prompt(prompt)
             wf.basic.set_seed(seed)
-
             wf.basic.set_negative_prompt(info["negative_prompt"])
             wf.basic.set_cfg(info["cfg"])
             wf.basic.set_width(info["width"])
@@ -131,9 +129,8 @@ async def generate_dataset(config_name: str):
             wf.basic.set_steps(info["steps"])
             wf.basic.set_checkpoint(info["checkpoint"])
 
-            if "character" in features:
-                img_info["character"] = {"code": person_id_code}
-                profile_image = Image.open(
+            profile_images = [
+                Image.open(
                     os.path.join(
                         OUTPUT_DIR,
                         "identities",
@@ -141,12 +138,18 @@ async def generate_dataset(config_name: str):
                         f"{person_id_code}.png",
                     )
                 )
-                wf.character.set_image(img_2_base64(profile_image))
-                character = conf["character"]
-                wf.character.set_weight(character.get("weight", 1.0))
-                wf.character.set_end_at(character.get("end_at", 1.0))
-                wf.character.set_start_at(character.get("start_at", 0.0))
-                wf.character.set_weight_type(character.get("weight_type", "linear"))
+                for person_id_code in person_id_codes
+            ]
+
+            if "character" in features:
+                for p, profile_image in enumerate(profile_images):
+                    img_info["character"] = {"code": p}
+                    wf.character.set_image(img_2_base64(profile_image))
+                    character = conf["character"]
+                    wf.character.set_weight(character.get("weight", 1.0))
+                    wf.character.set_end_at(character.get("end_at", 1.0))
+                    wf.character.set_start_at(character.get("start_at", 0.0))
+                    wf.character.set_weight_type(character.get("weight_type", "linear"))
 
             wf.trim_workflow()
 
@@ -155,8 +158,14 @@ async def generate_dataset(config_name: str):
 
             req_id = str(uuid.uuid4())
             p = {"prompt": wf.get_workflow(), "client_id": req_id}
+            prompt_seed_pairs.append(
+                {
+                    "prompt": prompt,
+                    "seed": seed,
+                    "people": dict(zip(conf["person_codes"], person_id_codes)),
+                }
+            )
             imgs, timings = await comfy_send_request(p, req_id)
-
             img = imgs[0]
             rgb_img = img.convert("RGB")
             img_num_string = f"{img_num:08}"
@@ -173,7 +182,6 @@ async def generate_dataset(config_name: str):
                 ),
                 indent=2,
             )
-
             pbar.update(1)
 
     pbar.close()
@@ -184,6 +192,7 @@ async def main():
     for config_name in configs:
         print(f"Generating dataset for {config_name}")
         await generate_dataset(config_name)
+        exit()
 
 
 if __name__ == "__main__":
