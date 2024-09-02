@@ -69,7 +69,7 @@ configs: dict[str, dict[str, Any]] = {
     },
     "base_three_people_dreamshaper": {
         "raw_prompts": "raw_prompts_two.txt",
-        "person_codes": ["PERSON1", "PERSON2"],
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
     },
 }
