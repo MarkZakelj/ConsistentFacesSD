@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from workflow_builder.workflow_utils import replace_key
+from workflow_builder.workflow_utils import renumber_workflow, replace_key
 
 
 def main():
@@ -128,7 +128,8 @@ def main():
     # for key, val in list(target.items()):
     #     if val["_meta"]["title"].endswith("---"):
     #         target = replace_key(key, val["_meta"]["title"].rstrip("---"), target)
-    # renumber_workflow(target, True)
+    if args.numbered:
+        renumber_workflow(target, True)
     json.dump(target, open(args.output, "w"), indent=4)
 
 

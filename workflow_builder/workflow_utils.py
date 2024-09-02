@@ -345,7 +345,7 @@ def renumber_workflow(workflow: dict, inline=False) -> dict:
             m += 1
             key_mappings[key] = str(m)
             json.dump(key_mappings, open(map_path, "w"), indent=2)
-            print("Found new key")
+            print(f"Found new key: {key}")
         new_key = key_mappings[key]
         workflow = replace_key(key, new_key, workflow, inline=inline)
     return workflow
