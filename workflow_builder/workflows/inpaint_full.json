@@ -11,23 +11,6 @@
             "title": "Send Image (WebSocket)"
         }
     },
-    "NSFWDetection0": {
-        "inputs": {
-            "score": 0.9,
-            "image": [
-                "VAEDecode1",
-                0
-            ],
-            "alternative_image": [
-                "ImagePixelate0",
-                0
-            ]
-        },
-        "class_type": "NSFWDetection",
-        "_meta": {
-            "title": "NSFWDetection"
-        }
-    },
     "VAEDecode1": {
         "inputs": {
             "samples": [

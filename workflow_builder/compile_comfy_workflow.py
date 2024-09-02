@@ -10,6 +10,12 @@ def main():
     )
     parser.add_argument("-f", "--file", help="Target file", required=True)
     parser.add_argument("-o", "--output", help="Output file", required=True)
+    parser.add_argument(
+        "-n",
+        "--numbered",
+        help="ID are numbers instead of string names",
+        action="store_true",
+    )
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
         "--load-image64",
@@ -122,7 +128,7 @@ def main():
     # for key, val in list(target.items()):
     #     if val["_meta"]["title"].endswith("---"):
     #         target = replace_key(key, val["_meta"]["title"].rstrip("---"), target)
-
+    # renumber_workflow(target, True)
     json.dump(target, open(args.output, "w"), indent=4)
 
 

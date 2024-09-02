@@ -3,8 +3,10 @@ import os
 from functools import reduce
 
 from workflow_builder import (
+    MultipleCharactersFaceIdWorkflowManager,
     MultipleCharactersWorkflowManager,
     TextToImageWorkflowManager,
+    TwoCharactersFaceIdWorkflowManager,
 )
 
 from .test_workflow_utils import output_dir
@@ -131,3 +133,59 @@ class TestMultipleCharactersManagerNodesConnected:
         wm.save_workflow(
             os.path.join(output_dir, "multiple_characters", "two_char_pose.json")
         )
+
+
+class TestTwoCharactersNodesConnected:
+    def test_two_characters_faceid(self):
+        wm = TwoCharactersFaceIdWorkflowManager()
+        wm.trim_workflow()
+        files = [
+            "basic",
+            "lora",
+            "faceid",
+            "IPAdapterFaceID0",
+            "IPAdapterFaceID1",
+        ]
+        assert set(get_workflow_keys(wm.workflow)) == create_key_set(files)
+        wm.save_workflow(os.path.join(output_dir, "two_characters_faceid.json"))
+
+    def test_two_characters_faceid_pose(self):
+        wm = TwoCharactersFaceIdWorkflowManager()
+        wm.trim_workflow()
+        files = [
+            "basic",
+            "lora",
+            "mcfaceid",
+            "mcfaceidp0",
+            "mcfaceidp1",
+        ]
+        assert set(get_workflow_keys(wm.workflow)) == create_key_set(files)
+
+
+class TestMultipleCharactersNodesConnected:
+    def test_one_char(self):
+        wm = MultipleCharactersFaceIdWorkflowManager(n_characters=1)
+        wm.trim_workflow()
+        files = ["basic", "lora", "mcfaceid", "mcfaceidp0"]
+        wm.save_workflow(
+            os.path.join(output_dir, "multiple_characters", "mcfaceid_one_char.json")
+        )
+        assert set(get_workflow_keys(wm.workflow)) == create_key_set(files)
+
+    def test_two_char(self):
+        wm = MultipleCharactersFaceIdWorkflowManager(n_characters=2)
+        wm.trim_workflow()
+        files = ["basic", "lora", "mcfaceid", "mcfaceidp0", "mcfaceidp1"]
+        wm.save_workflow(
+            os.path.join(output_dir, "multiple_characters", "mcfaceid_two_char.json")
+        )
+        assert set(get_workflow_keys(wm.workflow)) == create_key_set(files)
+
+    def test_three_char(self):
+        wm = MultipleCharactersFaceIdWorkflowManager(n_characters=3)
+        wm.trim_workflow()
+        files = ["basic", "lora", "mcfaceid", "mcfaceidp0", "mcfaceidp1", "mcfaceidp2"]
+        wm.save_workflow(
+            os.path.join(output_dir, "multiple_characters", "mcfaceid_three_char.json")
+        )
+        assert set(get_workflow_keys(wm.workflow)) == create_key_set(files)

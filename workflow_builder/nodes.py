@@ -97,5 +97,5 @@ class IPAdapterFaceID(IPAdapter):
     def __init__(self, workflow, keyname):
         super().__init__(workflow, keyname)
 
-    def set_weight(self, weight: float):
+    def set_weight_v2(self, weight: float):
         self.workflow[self.keyname]["inputs"]["weight_faceidv2"] = weight

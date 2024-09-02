@@ -8,7 +8,7 @@ from workflow_builder.errors import CharacterIdNotInRangeError
 from workflow_builder.nodes import ApplyControlnet, IPAdapter, IPAdapterFaceID, Manager
 from workflow_builder.workflow_utils import is_image_filename
 
-MAX_CHARACTERS = 2  # maximum number of characters that can be used in the multiple character workflow
+MAX_CHARACTERS = 3  # maximum number of characters that can be used in the multiple character workflow
 
 
 class BasicManager(Manager):
@@ -276,6 +276,10 @@ class CharactersManagerFaceID(Manager):
     @check_character_id
     def set_start_at(self, start_at, character_id: int):
         self.ip_adapters[character_id].set_start_at(start_at)
+
+    @check_character_id
+    def set_weight_v2(self, weight_v2: float, character_id: int):
+        self.ip_adapters[character_id].set_weight_v2(weight_v2)
 
 
 class PoseManager(Manager):

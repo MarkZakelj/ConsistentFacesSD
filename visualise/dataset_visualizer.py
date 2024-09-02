@@ -5,9 +5,11 @@ import numpy as np
 import streamlit as st
 from PIL import Image, ImageDraw
 
+from headpose_extraction.sixdrepnet.utils import plot_pose_cube
 from pose_extraction.dwpose import decode_json_as_poses
 from pose_extraction.dwpose.util import draw_bodypose, draw_facepose
 from utils import list_directories_in_directory
+from utils.imgs import pad_bbox, square_bbox
 from utils.paths import OUTPUT_DIR
 
 # Configuration dictionary (you can modify this as needed)
@@ -33,8 +35,11 @@ colors = ["red", "green", "blue", "black"]
 
 def draw_bounding_box(image, face_infos):
     draw = ImageDraw.Draw(image)
+    image_size = (image.size[1], image.size[0])
     for i, info in enumerate(face_infos):
         bbox = info["bbox"]
+        bbox = pad_bbox(bbox, image_size, 0.2)
+        bbox = square_bbox(bbox, image_size)
         draw.rectangle(bbox, outline=colors[i % len(colors)], width=3)
     return image
 
@@ -46,6 +51,39 @@ def draw_poses(image, pose_infos):
         canvas = draw_bodypose(canvas, pose.body.keypoints)
         canvas = draw_facepose(canvas, pose.face)
     return Image.fromarray(canvas)
+
+
+def draw_headposes(image, face_infos):
+    image = np.array(image)
+    for i, info in enumerate(face_infos):
+        if "head_pose" not in info:
+            continue
+        bbox = info["bbox"]
+        head_pose = info["head_pose"]
+        x_min = int(bbox[0])
+        y_min = int(bbox[1])
+        x_max = int(bbox[2])
+        y_max = int(bbox[3])
+        bbox_width = abs(x_max - x_min)
+        bbox_height = abs(y_max - y_min)
+
+        x_min = max(0, x_min - int(0.2 * bbox_height))
+        y_min = max(0, y_min - int(0.2 * bbox_width))
+        x_max = x_max + int(0.2 * bbox_height)
+        y_max = y_max + int(0.2 * bbox_width)
+        yaw = head_pose["yaw"]
+        pitch = head_pose["pitch"]
+        roll = head_pose["roll"]
+        image = plot_pose_cube(
+            image,
+            yaw,
+            pitch,
+            roll,
+            x_min + int(0.5 * (x_max - x_min)),
+            y_min + int(0.5 * (y_max - y_min)),
+            size=bbox_width,
+        )
+    return Image.fromarray(image)
 
 
 def main():
@@ -109,6 +147,9 @@ def main():
             show_poses = st.checkbox(
                 f"Show poses for column {i + 1}", key=f"show_poses_{i}"
             )
+            show_headposes = st.checkbox(
+                f"Show headposes for column {i + 1}", key=f"show_headposes_{i}"
+            )
 
             if dataset:
                 dataset_path = config[dataset]
@@ -153,6 +194,9 @@ def main():
 
                     if show_poses and "pose_info" in img_info:
                         img = draw_poses(img, img_info["pose_info"])
+
+                    if show_headposes and "face_info" in img_info:
+                        img = draw_headposes(img, img_info["face_info"])
 
                     with st.container():
                         st.image(img, use_column_width=True)

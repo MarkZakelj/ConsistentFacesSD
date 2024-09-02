@@ -1,0 +1,155 @@
+{
+    "1": {
+        "inputs": {
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 6,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 1,
+            "model": [
+                "8",
+                0
+            ],
+            "positive": [
+                "3",
+                0
+            ],
+            "negative": [
+                "4",
+                0
+            ],
+            "latent_image": [
+                "2",
+                0
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSampler"
+        }
+    },
+    "2": {
+        "inputs": {
+            "width": 1024,
+            "height": 1024,
+            "batch_size": 1
+        },
+        "class_type": "EmptyLatentImage",
+        "_meta": {
+            "title": "Empty Latent Image"
+        }
+    },
+    "3": {
+        "inputs": {
+            "text": "photo of a couple, walking in paris, high quality",
+            "clip": [
+                "6",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "4": {
+        "inputs": {
+            "text": "eiffel tower",
+            "clip": [
+                "6",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)"
+        }
+    },
+    "5": {
+        "inputs": {
+            "samples": [
+                "1",
+                0
+            ],
+            "vae": [
+                "6",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "6": {
+        "inputs": {
+            "ckpt_name": "dreamshaperXL_lightningDPMSDE.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "Load Checkpoint"
+        }
+    },
+    "7": {
+        "inputs": {
+            "seed": 977851917760065
+        },
+        "class_type": "Seed (rgthree)",
+        "_meta": {
+            "title": "Seed (rgthree)"
+        }
+    },
+    "8": {
+        "inputs": {
+            "weight": 1,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "9",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "10",
+                0
+            ]
+        },
+        "class_type": "IPAdapterAdvanced",
+        "_meta": {
+            "title": "IPAdapter Advanced"
+        }
+    },
+    "9": {
+        "inputs": {
+            "preset": "PLUS FACE (portraits)",
+            "model": [
+                "6",
+                0
+            ]
+        },
+        "class_type": "IPAdapterUnifiedLoader",
+        "_meta": {
+            "title": "IPAdapter Unified Loader"
+        }
+    },
+    "10": {
+        "inputs": {
+            "image": "person_mugshot.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image"
+        }
+    }
+}

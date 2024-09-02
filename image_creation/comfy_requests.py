@@ -12,6 +12,7 @@ from PIL import Image
 
 from utils import SequentialTimer, get_exception_traceback_str
 from workflow_builder.full_manager import FullManager
+from workflow_builder.workflow_utils import renumber_workflow
 
 load_dotenv()
 
@@ -64,6 +65,9 @@ async def websocket_get_image(prompt_id: str, client_id: str, verbose=False):
 async def comfy_send_request(payload, req_id):
     imgs = []
     timings = {}
+    if "prompt" not in payload:
+        raise ValueError("Payload does not contain prompt")
+    payload["prompt"] = renumber_workflow(payload["prompt"])
     try:
         response = requests.post(comfy_url, json=payload, headers=JSONHEADERS)
         if response.status_code != 200:

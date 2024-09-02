@@ -63,5 +63,38 @@
     "ApplyControlNet(Advanced)PreGen0",
     "FilterPoses0",
     "LoadPosesJSON0"
+  ],
+  "mcfaceid": [
+    "KSamplerPose0",
+    "FaceMatcher0",
+    "MakeImageList0",
+    "UltralyticsDetectorProvider0",
+    "MaskFromPoints0",
+    "LoadControlNetModel0",
+    "IPAdapterUnifiedLoaderFaceID0",
+    "FaceAnalysisModels0",
+    "FaceBoundingBox0",
+    "DepthAnything0",
+    "DWPoseEstimator0",
+    "ApplyControlNet(Advanced)0",
+    "VAEDecode1"
+  ],
+  "mcfaceidp0": [
+    "IPAdapterFaceIDFace00",
+    "IPAdapterFaceID00",
+    "FaceDetailer00",
+    "LoadImageFace00"
+  ],
+  "mcfaceidp1": [
+    "LoadImageFace10",
+    "IPAdapterFaceIDFace10",
+    "IPAdapterFaceID10",
+    "FaceDetailer10"
+  ],
+    "mcfaceidp2": [
+    "LoadImageFace20",
+    "IPAdapterFaceIDFace20",
+    "IPAdapterFaceID20",
+    "FaceDetailer20"
   ]
 }

@@ -148,6 +148,40 @@ class MultipleCharactersWorkflowManager(FullManager):
             wfu.remove_inputs("MakeImageList0", [f"image{i}"], self.workflow)
 
 
+class TwoCharactersFaceIdWorkflowManager(FullManager):
+    def __init__(self):
+        super().__init__()
+        self.workflow = load_workflow("two_chars_faceid_full.json")
+
+        self.basic: BasicManager = BasicManager(workflow=self.workflow)
+        self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
+        self.pose_mask: PoseMaskManager = PoseMaskManager(workflow=self.workflow)
+        self.character: CharactersManagerFaceID = CharactersManagerFaceID(
+            workflow=self.workflow, ip_adapter_node_base_name="IPAdapterFaceID"
+        )
+
+        self.pose_mask.set_n_poses(2)
+
+
+class MultipleCharactersFaceIdWorkflowManager(FullManager):
+    def __init__(self, n_characters: int):
+        super().__init__()
+        self.workflow = load_workflow("three_chars_faceid_full.json")
+
+        self.basic: BasicManager = BasicManager(workflow=self.workflow)
+        self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
+        self.pose_mask: PoseMaskManager = PoseMaskManager(workflow=self.workflow)
+        self.character: CharactersManagerFaceID = CharactersManagerFaceID(
+            workflow=self.workflow, ip_adapter_node_base_name="IPAdapterFaceID"
+        )
+
+        self.pose_mask.set_n_poses(3)
+        for i in range(n_characters, MAX_CHARACTERS):
+            wfu.skip_node(f"IPAdapterFaceID{i}0", [("model", 0)], self.workflow)
+            wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
+            wfu.remove_inputs("MakeImageList0", [f"image{i+1}"], self.workflow)
+
+
 class MCFaceIDFaceSwapWorkflowManager(FullManager):
     def __init__(self, n_characters, features=None):
         super().__init__()

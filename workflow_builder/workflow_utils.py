@@ -4,6 +4,8 @@ import re
 from collections import deque
 from copy import deepcopy
 
+from utils.paths import ROOT_DIR
+
 from .const import IMG_EXTENSIONS
 from .errors import NodeNotFoundError
 
@@ -325,4 +327,25 @@ def convert_load_to_loadb64(workflow: dict, target=None, inline=False) -> dict:
                 "class_type": "ETN_LoadImageBase64",
                 "_meta": {"title": "Load Image (Base64)"},
             }
+    return workflow
+
+
+def renumber_workflow(workflow: dict, inline=False) -> dict:
+    """
+    Renumber the workflow keys, if they are named keys, turn them into numbered keys
+    """
+    map_path = os.path.join(ROOT_DIR, "workflow_builder", "key_mappings.json")
+    key_mappings = json.load(open(map_path))
+    all_numbers = set([int(e) for e in key_mappings.values()])
+    m = max(all_numbers) if all_numbers else 0
+    if len(all_numbers) != m:
+        raise ValueError("Numbering not continuous")
+    for i, key in enumerate(list(workflow.keys())):
+        if key not in key_mappings:
+            m += 1
+            key_mappings[key] = str(m)
+            json.dump(key_mappings, open(map_path, "w"), indent=2)
+            print("Found new key")
+        new_key = key_mappings[key]
+        workflow = replace_key(key, new_key, workflow, inline=inline)
     return workflow
