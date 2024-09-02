@@ -13,6 +13,7 @@ from tqdm import tqdm
 from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import TextToImageWorkflowManager
+from workflow_builder.workflow_utils import renumber_workflow
 
 random.seed(42)
 
@@ -57,11 +58,13 @@ configs: dict[str, dict[str, Any]] = {
         "raw_prompts": "raw_prompts.txt",
         "person_codes": ["PERSON1"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "png": True,
     },
     "base_two_people_dreamshaper": {
         "raw_prompts": "raw_prompts_two.txt",
         "person_codes": ["PERSON1", "PERSON2"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "png": True,
     },
     "base_two_people": {
         "raw_prompts": "raw_prompts_two.txt",
@@ -71,6 +74,7 @@ configs: dict[str, dict[str, Any]] = {
         "raw_prompts": "raw_prompts_two.txt",
         "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "png": True,
     },
 }
 
@@ -85,6 +89,8 @@ async def generate_dataset(config_name: str):
     os.makedirs(img_save_path, exist_ok=True)
     os.makedirs(os.path.join(img_save_path, "images"), exist_ok=True)
     os.makedirs(os.path.join(img_save_path, "img_info"), exist_ok=True)
+    if conf.get("png", False):
+        os.makedirs(os.path.join(img_save_path, "images_png"), exist_ok=True)
     total_images = len(lines) * NSEEDS
     info = {
         "n_images": total_images,
@@ -139,19 +145,18 @@ async def generate_dataset(config_name: str):
             wf.basic.set_steps(info["steps"])
             wf.basic.set_checkpoint(info["checkpoint"])
 
-            profile_images = [
-                Image.open(
-                    os.path.join(
-                        OUTPUT_DIR,
-                        "identities",
-                        "images_224x224",
-                        f"{person_id_code}.png",
-                    )
-                )
-                for person_id_code in person_id_codes
-            ]
-
             if "character" in features:
+                profile_images = [
+                    Image.open(
+                        os.path.join(
+                            OUTPUT_DIR,
+                            "identities",
+                            "images_224x224",
+                            f"{person_id_code}.png",
+                        )
+                    )
+                    for person_id_code in person_id_codes
+                ]
                 for p, profile_image in enumerate(profile_images):
                     img_info["character"] = {"code": p}
                     wf.character.set_image(img_2_base64(profile_image))
@@ -165,6 +170,16 @@ async def generate_dataset(config_name: str):
 
             if img_num == 0:
                 print(json.dumps(wf.get_workflow(), indent=2))
+                json.dump(
+                    wf.get_workflow(),
+                    open(os.path.join(img_save_path, "workflow.json"), "w"),
+                    indent=2,
+                )
+                json.dump(
+                    renumber_workflow(wf.get_workflow()),
+                    open(os.path.join(img_save_path, "workflow_renumbered.json"), "w"),
+                    indent=2,
+                )
 
             req_id = str(uuid.uuid4())
             p = {"prompt": wf.get_workflow(), "client_id": req_id}
@@ -176,6 +191,7 @@ async def generate_dataset(config_name: str):
                 }
             )
             imgs, timings = await comfy_send_request(p, req_id)
+
             img = imgs[0]
             rgb_img = img.convert("RGB")
             img_num_string = f"{img_num:08}"
@@ -184,6 +200,10 @@ async def generate_dataset(config_name: str):
                 "JPEG",
                 quality=80,
             )
+            if conf.get("png", False):
+                img.save(
+                    os.path.join(img_save_path, "images_png", f"{img_num_string}.png")
+                )
             json.dump(
                 img_info,
                 open(
