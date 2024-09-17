@@ -35,5 +35,13 @@
   "VAEDecode1": "34",
   "FaceDetailer00": "35",
   "FaceDetailer10": "36",
-  "SendImage(WebSocket)0": "37"
+  "SendImage(WebSocket)0": "37",
+  "FaceDetailer0": "38",
+  "LoadImageFace20": "39",
+  "IPAdapterFaceID20": "40",
+  "FaceDetailer20": "41",
+  "IPAdapterFaceIDFace20": "42",
+  "LoadImage(Base64)Face00": "43",
+  "LoadImage(Base64)Face10": "44",
+  "LoadImage(Base64)Face20": "45"
 }

@@ -20,6 +20,14 @@ logger = logging.getLogger("uvicorn")
 logger.setLevel(logging.DEBUG)
 
 
+def check_valid_features(features, possible_features):
+    for feature in features:
+        if feature not in possible_features:
+            raise ValueError(
+                f"Feature {feature} is not available from {possible_features}"
+            )
+
+
 class FullManager(Manager):
     """Parent class for FullManagers.
     Full Managers have a dedicated workflow in json files and
@@ -164,9 +172,14 @@ class TwoCharactersFaceIdWorkflowManager(FullManager):
 
 
 class MultipleCharactersFaceIdWorkflowManager(FullManager):
-    def __init__(self, n_characters: int):
+    def __init__(self, n_characters: int, features=None):
         super().__init__()
-        self.workflow = load_workflow("three_chars_faceid_full.json")
+        if features is None:
+            features = []
+
+        check_valid_features(features, {"no-face-detailer"})
+
+        self.workflow = load_workflow("multiple_characters_workflow_full.json")
 
         self.basic: BasicManager = BasicManager(workflow=self.workflow)
         self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
@@ -175,11 +188,15 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
             workflow=self.workflow, ip_adapter_node_base_name="IPAdapterFaceID"
         )
 
-        self.pose_mask.set_n_poses(3)
+        self.pose_mask.set_n_poses(10)
         for i in range(n_characters, MAX_CHARACTERS):
             wfu.skip_node(f"IPAdapterFaceID{i}0", [("model", 0)], self.workflow)
             wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
             wfu.remove_inputs("MakeImageList0", [f"image{i+1}"], self.workflow)
+
+        if "no-face-detailer" in features:
+            for i in range(n_characters):
+                wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
 
 
 class MCFaceIDFaceSwapWorkflowManager(FullManager):

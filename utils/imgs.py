@@ -5,9 +5,10 @@ from io import BytesIO
 
 import cv2
 import numpy as np
+import torch
 from PIL import Image
 
-from utils.paths import OUTPUT_DIR
+from utils.paths import DATA_DIR, OUTPUT_DIR
 
 
 def prepare_img_code(img_code: int | str):
@@ -38,6 +39,15 @@ def read_base64_image(path: str, as_image=False) -> str | Image.Image:
     return base64_string
 
 
+def np_2_tensor(img: np.ndarray):
+    """
+    Convert a numpy array to a PyTorch tensor uint8
+    :param img: np.ndarray - image to convert, (H, W, C)
+    :return: tensor: torch.Tensor - converted image (B, C, H, W)
+    """
+    return torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0)
+
+
 def get_img_paths_in_dir(directory):
     types = (".jpg", ".png", ".jpeg")  # the tuple of file types
     img_paths = []
@@ -56,6 +66,18 @@ def count_images_in_dir(directory):
             if file.endswith(types):
                 count += 1
     return count
+
+
+def get_subset_info(subset_name: str):
+    sub_dir = os.path.join(OUTPUT_DIR, subset_name)
+    info = json.load(open(os.path.join(sub_dir, "info.json")))
+    return info
+
+
+def get_prompt_seed_pairs(n_people):
+    return json.load(
+        open(os.path.join(DATA_DIR, f"prompt_seed_pairs_{n_people}.json"), "r")
+    )
 
 
 def get_img_info(subset_name: str, img_code: int | str):
@@ -118,9 +140,13 @@ def get_image_and_info(subset_name: str, img_code: int | str):
     return img, info
 
 
-def update_img_info(subset_name: str, img_code: int | str, info_update: dict):
+def update_img_info(
+    subset_name: str, img_code: int | str, info_update: dict, replace=False
+):
     info = get_img_info(subset_name, img_code)
     info = info | info_update
+    if replace:
+        info = info_update
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     info_path = os.path.join(sub_dir, "img_info", prepare_img_code(img_code) + ".json")
     with open(info_path, "w") as f:
@@ -262,3 +288,76 @@ def get_bbox_size(bbox):
     :return: size: int - size of the bounding box in pixels
     """
     return (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+
+
+def sort_faces_by_size(face_info):
+    # Create a list of tuples containing face info and their original index
+    indexed_faces = [(i, face) for i, face in enumerate(face_info)]
+
+    # Sort by the size of the bounding box (width * height)
+    sorted_faces = sorted(
+        indexed_faces,
+        key=lambda x: (x[1]["bbox"][2] - x[1]["bbox"][0])
+        * (x[1]["bbox"][3] - x[1]["bbox"][1]),
+        reverse=True,
+    )
+
+    # Separate the indices and sorted face info
+    sorted_indices = [i for i, face in sorted_faces]
+    sorted_face_info = [face for i, face in sorted_faces]
+
+    return sorted_face_info, sorted_indices
+
+
+def get_identity_img(person_id_code: str) -> np.ndarray:
+    """read the identity image from the identities folder and return numpy image"""
+    img_path = os.path.join(
+        OUTPUT_DIR,
+        "identities",
+        "images_224x224",
+        f"{person_id_code}.png",
+    )
+    img = np.array(Image.open(img_path))
+    return img
+
+
+def get_img_from_bbox(
+    target_image: np.ndarray,
+    bbox: list,
+    square: bool = False,
+    pad: float = 0.0,
+    resize: tuple[int, int] | int = None,
+):
+    """
+    Get the image from the bounding box.
+    :param target_image: target image, (H, W, C) RGB format
+    :param bbox: bounding box in the image
+    :param square: should you force the bbox to be square
+    :param pad: percentage of padding to add to the bounding box
+    :param resize: resize the final bounding box to this dimension
+    :return:
+    """
+    img_shape = target_image.shape[:2]
+    bbox = pad_bbox(bbox, img_shape, pad)
+    if square:
+        bbox = square_bbox(bbox, img_shape)
+    if not is_valid_bbox(bbox, img_shape):
+        raise ValueError("Invalid bounding box")
+    x1, y1, x2, y2 = bbox
+    face_img = target_image[y1:y2, x1:x2]
+    if resize is not None:
+        if isinstance(resize, tuple):
+            # If resize is a tuple, use it directly
+            face_img = cv2.resize(face_img, resize)
+        else:
+            # If resize is not a tuple, assume it's an integer
+            # Calculate the scaling factor to make the shortest side equal to 'resize'
+            h, w = face_img.shape[:2]
+            if h < w:
+                new_h = resize
+                new_w = int(w * (resize / h))
+            else:
+                new_w = resize
+                new_h = int(h * (resize / w))
+            face_img = cv2.resize(face_img, (new_w, new_h))
+    return face_img

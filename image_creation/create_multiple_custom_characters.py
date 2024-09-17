@@ -13,6 +13,7 @@ from tqdm import tqdm
 from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
 from workflow_builder import MultipleCharactersFaceIdWorkflowManager
+from workflow_builder.workflow_utils import renumber_workflow
 
 random.seed(42)
 
@@ -29,6 +30,12 @@ configs: dict[str, dict[str, Any]] = {
         "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
     },
+    "two_people_faceid_no_facedetailer": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-face-detailer"],
+    },
 }
 
 
@@ -43,6 +50,8 @@ async def generate_dataset(config_name: str):
     os.makedirs(img_save_path, exist_ok=True)
     os.makedirs(os.path.join(img_save_path, "images"), exist_ok=True)
     os.makedirs(os.path.join(img_save_path, "img_info"), exist_ok=True)
+    if conf.get("png", False):
+        os.makedirs(os.path.join(img_save_path, "images_png"), exist_ok=True)
     total_images = len(lines) * NSEEDS
     info = {
         "n_images": total_images,
@@ -59,7 +68,6 @@ async def generate_dataset(config_name: str):
         ),
     } | conf
     print("INFO:")
-    print(json.dumps(info, indent=2))
     json.dump(info, open(os.path.join(img_save_path, "info.json"), "w"), indent=2)
 
     pbar = tqdm(total=total_images, desc="Generating images")
@@ -73,24 +81,22 @@ async def generate_dataset(config_name: str):
             img_num = i * NSEEDS + j
             prompt = prompt_seed_pairs[img_num]["prompt"]
             person_id_codes = list(prompt_seed_pairs[img_num]["people"].values())
-            # person_id_codes = []
-            # for person_code in conf["person_codes"]:
-            #     prompt, person_id_code = replace_with_random_person(prompt, person_code)
-            #     person_id_codes.append(person_id_code)
+
             pbar.set_description(
                 f"{config_name}: Processing image {img_num} - {prompt[:80]}..."
             )
-            # seed = random.randint(0, 9999999999999)
             seed = prompt_seed_pairs[img_num]["seed"]
 
-            # make sure to execute all random calls first to keep randomness consistent
             if image_exists(config_name, img_num):
                 pbar.update(1)
                 continue
 
             img_info = {"prompt": prompt, "seed": seed}
             # wf = TwoCharactersFaceIdWorkflowManager()
-            wf = MultipleCharactersFaceIdWorkflowManager(n_characters=n_people)
+
+            wf = MultipleCharactersFaceIdWorkflowManager(
+                n_characters=n_people, features=conf.get("features", [])
+            )
             wf.basic.set_prompt(prompt)
             wf.basic.set_seed(seed)
 
@@ -120,18 +126,22 @@ async def generate_dataset(config_name: str):
 
             wf.trim_workflow()
 
-            # if img_num == 0:
-            #     print(json.dumps(wf.get_workflow(), indent=2))
+            if img_num == 0:
+                print(json.dumps(wf.get_workflow(), indent=2))
+                json.dump(
+                    wf.get_workflow(),
+                    open(os.path.join(img_save_path, "workflow.json"), "w"),
+                    indent=2,
+                )
+                json.dump(
+                    renumber_workflow(wf.get_workflow()),
+                    open(os.path.join(img_save_path, "workflow_renumbered.json"), "w"),
+                    indent=2,
+                )
 
             req_id = str(uuid.uuid4())
             p = {"prompt": wf.get_workflow(), "client_id": req_id}
-            # prompt_seed_pairs.append(
-            #     {
-            #         "prompt": prompt,
-            #         "seed": seed,
-            #         "people": dict(zip(conf["person_codes"], person_id_codes)),
-            #     }
-            # )
+
             imgs, timings = await comfy_send_request(p, req_id)
 
             img = imgs[0]
@@ -142,6 +152,10 @@ async def generate_dataset(config_name: str):
                 "JPEG",
                 quality=80,
             )
+            if conf.get("png", False):
+                rgb_img.save(
+                    os.path.join(img_save_path, "images_png", f"{img_num_string}.png")
+                )
             json.dump(
                 img_info,
                 open(
@@ -153,11 +167,6 @@ async def generate_dataset(config_name: str):
 
             pbar.update(1)
     pbar.close()
-    # json.dump(
-    #     prompt_seed_pairs,
-    #     open(os.path.join(img_save_path, "prompt_seed_pairs.json"), "w"),
-    #     indent=2,
-    # )
 
 
 async def main():

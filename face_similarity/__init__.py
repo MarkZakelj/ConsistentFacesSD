@@ -9,6 +9,13 @@ from PIL import Image, ImageDraw
 from utils.imgs import square_bbox
 from utils.paths import ROOT_DIR
 
+
+class NoFilterCriteriaError(Exception):
+    def __init__(self, message="No images passed the filter criteria."):
+        self.message = message
+        super().__init__(self.message)
+
+
 INSIGHTFACE_DIR = os.path.join(ROOT_DIR, "models", "insightface")
 
 THRESHOLDS = {  # from DeepFace
@@ -232,7 +239,7 @@ class FaceEmbedDistance:
                 out_dist.append(dist)
 
         if not out:
-            raise Exception("No image matches the filter criteria.")
+            raise NoFilterCriteriaError("No image matches the filter criteria.")
 
         out = torch.stack(out)
 

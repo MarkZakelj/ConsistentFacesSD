@@ -3,15 +3,18 @@ import os
 
 import numpy as np
 import streamlit as st
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
+from face_similarity.main import calculate_similarity
 from headpose_extraction.sixdrepnet.utils import plot_pose_cube
 from pose_extraction.dwpose import decode_json_as_poses
 from pose_extraction.dwpose.util import draw_bodypose, draw_facepose
 from utils import list_directories_in_directory
-from utils.imgs import pad_bbox, square_bbox
+from utils.imgs import pad_bbox, square_bbox, update_img_info
 from utils.paths import OUTPUT_DIR
 
+font = ImageFont.truetype("Arial", size=24)
+font_small = ImageFont.truetype("Arial", size=18)
 # Configuration dictionary (you can modify this as needed)
 config = {
     str(setname): str(os.path.join(OUTPUT_DIR, setname))
@@ -33,7 +36,9 @@ def load_json(json_path):
 colors = ["red", "green", "blue", "black"]
 
 
-def draw_bounding_box(image, face_infos):
+def draw_bounding_box(
+    image, face_infos, show_identity=False, show_number=False, identity_similarity=False
+):
     draw = ImageDraw.Draw(image)
     image_size = (image.size[1], image.size[0])
     for i, info in enumerate(face_infos):
@@ -41,6 +46,20 @@ def draw_bounding_box(image, face_infos):
         bbox = pad_bbox(bbox, image_size, 0.2)
         bbox = square_bbox(bbox, image_size)
         draw.rectangle(bbox, outline=colors[i % len(colors)], width=3)
+        if show_number:
+            draw.text(
+                (bbox[0], bbox[1] - 15), f"{i + 1}", fill="white", font=font_small
+            )
+        if show_identity:
+            text = info.get("identity", "unknown")
+            if not text:
+                text = "unknown"
+            fill = "gray" if text == "unknown" else "white"
+            draw.text((bbox[0], bbox[1]), text, fill=fill, font=font)
+        if identity_similarity:
+            text = f"{info.get('similarity_cosine', -1):.2f}"
+            fill = "white" if info.get("similarity_cosine", -1) > 0.0 else "gray"
+            draw.text((bbox[0], bbox[1] + 20), text, fill=fill, font=font)
     return image
 
 
@@ -51,6 +70,12 @@ def draw_poses(image, pose_infos):
         canvas = draw_bodypose(canvas, pose.body.keypoints)
         canvas = draw_facepose(canvas, pose.face)
     return Image.fromarray(canvas)
+
+
+def draw_img_num(image, img_num):
+    draw = ImageDraw.Draw(image)
+    draw.text((10, 10), f"{img_num}", fill="white", font=font)
+    return image
 
 
 def draw_headposes(image, face_infos):
@@ -89,7 +114,7 @@ def draw_headposes(image, face_infos):
 def main():
     st.title("Image Dataset Visualizer")
     # Number of columns selection
-    num_columns = st.sidebar.radio("Number of columns", [1, 2, 3])
+    num_columns = st.sidebar.radio("Number of columns", [1, 2, 3], index=1)
 
     # Image limit selection (applies to all columns)
     image_limit = st.sidebar.selectbox(
@@ -120,6 +145,25 @@ def main():
         key="page_number",
     )
 
+    # Show prompts option
+    show_prompts = st.sidebar.checkbox("Show prompts", key="show_prompts")
+
+    show_poses = st.sidebar.checkbox("Show poses", key="show_poses")
+    show_headposes = st.sidebar.checkbox("Show headposes", key="show_headposes")
+    # Show face bounding boxes option
+    show_bboxes = st.sidebar.checkbox("Show face bounding boxes", key="show_bboxes")
+    show_identity = st.sidebar.checkbox("Show identity", key="show_identity")
+    show_identity_similarity = st.sidebar.checkbox(
+        "Show identity similarity", key="show_identity_similarity"
+    )
+
+    show_bbox_num = st.sidebar.checkbox(
+        "Show bounding box numbers", key="show_bbox_num"
+    )
+    change_face_identities = st.sidebar.checkbox(
+        "Change face identities", key="change_face_identities"
+    )
+    show_seed = st.sidebar.checkbox("Show seed", key="show_seed")
     # Create columns based on user selection
     columns = st.columns(num_columns)
 
@@ -132,23 +176,6 @@ def main():
                 f"Select dataset for column {i + 1}",
                 sorted(list(config.keys())),
                 key=f"dataset_{i}",
-            )
-
-            # Show prompts option
-            show_prompts = st.checkbox(
-                f"Show prompts for column {i + 1}", key=f"show_prompts_{i}"
-            )
-
-            # Show face bounding boxes option
-            show_bboxes = st.checkbox(
-                f"Show face bounding boxes for column {i + 1}", key=f"show_bboxes_{i}"
-            )
-
-            show_poses = st.checkbox(
-                f"Show poses for column {i + 1}", key=f"show_poses_{i}"
-            )
-            show_headposes = st.checkbox(
-                f"Show headposes for column {i + 1}", key=f"show_headposes_{i}"
             )
 
             if dataset:
@@ -174,7 +201,8 @@ def main():
                 end_index = start_index + image_limit
                 images_to_display = image_files[start_index:end_index]
 
-                for img_file in images_to_display:
+                for n, img_file in enumerate(images_to_display):
+                    img_num = start_index + n
                     img_path = os.path.join(images_path, img_file)
                     img = load_image(img_path)
 
@@ -190,18 +218,57 @@ def main():
                             raise ValueError
 
                     if show_bboxes and "face_info" in img_info:
-                        img = draw_bounding_box(img, img_info["face_info"])
+                        img = draw_bounding_box(
+                            img,
+                            img_info["face_info"],
+                            show_identity=show_identity,
+                            show_number=show_bbox_num,
+                            identity_similarity=show_identity_similarity,
+                        )
 
                     if show_poses and "pose_info" in img_info:
                         img = draw_poses(img, img_info["pose_info"])
 
                     if show_headposes and "face_info" in img_info:
                         img = draw_headposes(img, img_info["face_info"])
-
+                    img = draw_img_num(img, img_num)
                     with st.container():
                         st.image(img, use_column_width=True)
                         if show_prompts and img_info:
                             st.write(f"Prompt: {img_info.get('prompt', 'N/A')}")
+                        if show_seed and img_info:
+                            st.write(f"Seed: {img_info.get('seed', 'N/A')}")
+
+                        if change_face_identities:
+                            for j, info in enumerate(img_info.get("face_info", [])):
+                                new_identity = st.text_input(
+                                    f"Identity {j + 1}",
+                                    info.get("identity", ""),
+                                    key=f"identity_{img_num}_{dataset_path}_{j}_{i}",
+                                )
+                                info["identity"] = new_identity
+
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if st.button(
+                                    "Save identities",
+                                    key=f"save_identities_{img_num}_{dataset_path}_{i}",
+                                ):
+                                    for j, info in enumerate(
+                                        img_info.get("face_info", [])
+                                    ):
+                                        if "similarity_cosine" in info:
+                                            del info["similarity_cosine"]
+                                    update_img_info(dataset, img_num, img_info)
+                                    st.rerun()
+
+                            with col2:
+                                if st.button(
+                                    "Recalculate ID",
+                                    key=f"recalculate_identities_{img_num}_{dataset_path}_{i}",
+                                ):
+                                    calculate_similarity(dataset, ids=[img_num])
+                                    st.rerun()
 
 
 if __name__ == "__main__":

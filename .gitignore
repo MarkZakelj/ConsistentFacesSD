@@ -11,3 +11,4 @@ venv
 tests/output
 tests/*/output
 data/output/
+data/models

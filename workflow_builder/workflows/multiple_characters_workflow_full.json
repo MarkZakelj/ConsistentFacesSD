@@ -1,224 +1,35 @@
 {
-    "LoadImageFace20": {
+    "KSampler0": {
         "inputs": {
-            "image": "18-bla-wom.png",
-            "upload": "image"
-        },
-        "class_type": "LoadImage",
-        "_meta": {
-            "title": "Load Image Face 2"
-        }
-    },
-    "IPAdapterFaceID20": {
-        "inputs": {
-            "weight": 1,
-            "weight_faceidv2": 0.7000000000000001,
-            "weight_type": "linear",
-            "combine_embeds": "concat",
-            "start_at": 0,
-            "end_at": 1,
-            "embeds_scaling": "V only",
+            "seed": [
+                "Seed(rgthree)0",
+                0
+            ],
+            "steps": 6,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 1,
             "model": [
-                "IPAdapterUnifiedLoaderFaceID0",
+                "IPAdapterFaceID00",
                 0
-            ],
-            "ipadapter": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                1
-            ],
-            "image": [
-                "LoadImageFace20",
-                0
-            ],
-            "attn_mask": [
-                "MaskFromPoints0",
-                3
-            ]
-        },
-        "class_type": "IPAdapterFaceID",
-        "_meta": {
-            "title": "IPAdapter FaceID 2"
-        }
-    },
-    "FaceDetailer20": {
-        "inputs": {
-            "guide_size": 800,
-            "guide_size_for": true,
-            "max_size": 1024,
-            "seed": 203141760371081,
-            "steps": 20,
-            "cfg": 8,
-            "sampler_name": "euler",
-            "scheduler": "normal",
-            "denoise": 0.5,
-            "feather": 5,
-            "noise_mask": true,
-            "force_inpaint": true,
-            "bbox_threshold": 0.5,
-            "bbox_dilation": 10,
-            "bbox_crop_factor": 3,
-            "sam_detection_hint": "center-1",
-            "sam_dilation": 0,
-            "sam_threshold": 0.93,
-            "sam_bbox_expansion": 0,
-            "sam_mask_hint_threshold": 0.7,
-            "sam_mask_hint_use_negative": "False",
-            "drop_size": 10,
-            "wildcard": "",
-            "cycle": 1,
-            "use_top_n": 1,
-            "search_mask_percentage": 0.6,
-            "inpaint_model": false,
-            "noise_mask_feather": 20,
-            "image": [
-                "FaceDetailer10",
-                0
-            ],
-            "model": [
-                "IPAdapterFaceIDFace20",
-                0
-            ],
-            "clip": [
-                "LoraLoaderStack(rgthree)0",
-                1
-            ],
-            "vae": [
-                "LoadCheckpoint0",
-                2
             ],
             "positive": [
-                "CLIPTextEncode(Prompt)Positive0",
+                "ApplyControlNet(Advanced)0",
                 0
             ],
             "negative": [
-                "CLIPTextEncode(Prompt)Negative0",
-                0
-            ],
-            "bbox_detector": [
-                "UltralyticsDetectorProvider0",
-                0
-            ],
-            "search_mask": [
-                "MaskFromPoints0",
-                3
-            ]
-        },
-        "class_type": "FaceDetailer",
-        "_meta": {
-            "title": "FaceDetailer 2"
-        }
-    },
-    "IPAdapterFaceIDFace20": {
-        "inputs": {
-            "weight": 1,
-            "weight_faceidv2": 1,
-            "weight_type": "linear",
-            "combine_embeds": "concat",
-            "start_at": 0,
-            "end_at": 1,
-            "embeds_scaling": "V only",
-            "model": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                0
-            ],
-            "ipadapter": [
-                "IPAdapterUnifiedLoaderFaceID0",
+                "ApplyControlNet(Advanced)0",
                 1
             ],
-            "image": [
-                "LoadImageFace20",
+            "latent_image": [
+                "EmptyLatentImage0",
                 0
             ]
         },
-        "class_type": "IPAdapterFaceID",
+        "class_type": "KSampler",
         "_meta": {
-            "title": "IPAdapter FaceID Face 2"
-        }
-    },
-    "FaceAnalysisModels0": {
-        "inputs": {
-            "library": "insightface",
-            "provider": "CPU"
-        },
-        "class_type": "FaceAnalysisModels",
-        "_meta": {
-            "title": "Face Analysis Models"
-        }
-    },
-    "Width0": {
-        "inputs": {
-            "number_type": "integer",
-            "number": 1024
-        },
-        "class_type": "Constant Number",
-        "_meta": {
-            "title": "Width"
-        }
-    },
-    "Height0": {
-        "inputs": {
-            "number_type": "integer",
-            "number": 1024
-        },
-        "class_type": "Constant Number",
-        "_meta": {
-            "title": "Height"
-        }
-    },
-    "LoadControlNetModel0": {
-        "inputs": {
-            "control_net_name": "SDXL/controlnet-depth-sdxl-1.0/diffusion_pytorch_model.safetensors"
-        },
-        "class_type": "ControlNetLoader",
-        "_meta": {
-            "title": "Load ControlNet Model"
-        }
-    },
-    "LoadCheckpoint0": {
-        "inputs": {
-            "ckpt_name": "DreamShaperXL_Lightning.safetensors"
-        },
-        "class_type": "CheckpointLoaderSimple",
-        "_meta": {
-            "title": "Load Checkpoint"
-        }
-    },
-    "LoadImageFace00": {
-        "inputs": {
-            "image": "40-asi-man.png",
-            "upload": "image"
-        },
-        "class_type": "LoadImage",
-        "_meta": {
-            "title": "Load Image Face 0"
-        }
-    },
-    "LoadImageFace10": {
-        "inputs": {
-            "image": "cin-40-cau-fem.png",
-            "upload": "image"
-        },
-        "class_type": "LoadImage",
-        "_meta": {
-            "title": "Load Image Face 1"
-        }
-    },
-    "UltralyticsDetectorProvider0": {
-        "inputs": {
-            "model_name": "bbox/face_yolov8m.pt"
-        },
-        "class_type": "UltralyticsDetectorProvider",
-        "_meta": {
-            "title": "UltralyticsDetectorProvider"
-        }
-    },
-    "Seed(rgthree)0": {
-        "inputs": {
-            "seed": 101216748829557
-        },
-        "class_type": "Seed (rgthree)",
-        "_meta": {
-            "title": "Seed (rgthree)"
+            "title": "KSampler"
         }
     },
     "EmptyLatentImage0": {
@@ -238,178 +49,6 @@
             "title": "Empty Latent Image"
         }
     },
-    "IPAdapterUnifiedLoaderFaceID0": {
-        "inputs": {
-            "preset": "FACEID PLUS V2",
-            "lora_strength": 0.6,
-            "provider": "CPU",
-            "model": [
-                "LoadCheckpoint0",
-                0
-            ]
-        },
-        "class_type": "IPAdapterUnifiedLoaderFaceID",
-        "_meta": {
-            "title": "IPAdapter Unified Loader FaceID"
-        }
-    },
-    "LoraLoaderStack(rgthree)0": {
-        "inputs": {
-            "lora_01": "None",
-            "strength_01": 1,
-            "lora_02": "None",
-            "strength_02": 1,
-            "lora_03": "None",
-            "strength_03": 1,
-            "lora_04": "None",
-            "strength_04": 1,
-            "model": [
-                "LoadCheckpoint0",
-                0
-            ],
-            "clip": [
-                "LoadCheckpoint0",
-                1
-            ]
-        },
-        "class_type": "Lora Loader Stack (rgthree)",
-        "_meta": {
-            "title": "Lora Loader Stack (rgthree)"
-        }
-    },
-    "MakeImageList0": {
-        "inputs": {
-            "image1": [
-                "LoadImageFace00",
-                0
-            ],
-            "image2": [
-                "LoadImageFace10",
-                0
-            ],
-            "image3": [
-                "LoadImageFace20",
-                0
-            ]
-        },
-        "class_type": "ImpactMakeImageList",
-        "_meta": {
-            "title": "Make Image List"
-        }
-    },
-    "IPAdapterFaceIDFace00": {
-        "inputs": {
-            "weight": 1,
-            "weight_faceidv2": 1,
-            "weight_type": "linear",
-            "combine_embeds": "concat",
-            "start_at": 0,
-            "end_at": 1,
-            "embeds_scaling": "V only",
-            "model": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                0
-            ],
-            "ipadapter": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                1
-            ],
-            "image": [
-                "LoadImageFace00",
-                0
-            ]
-        },
-        "class_type": "IPAdapterFaceID",
-        "_meta": {
-            "title": "IPAdapter FaceID Face0"
-        }
-    },
-    "IPAdapterFaceIDFace10": {
-        "inputs": {
-            "weight": 1,
-            "weight_faceidv2": 1,
-            "weight_type": "linear",
-            "combine_embeds": "concat",
-            "start_at": 0,
-            "end_at": 1,
-            "embeds_scaling": "V only",
-            "model": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                0
-            ],
-            "ipadapter": [
-                "IPAdapterUnifiedLoaderFaceID0",
-                1
-            ],
-            "image": [
-                "LoadImageFace10",
-                0
-            ]
-        },
-        "class_type": "IPAdapterFaceID",
-        "_meta": {
-            "title": "IPAdapter FaceID Face1"
-        }
-    },
-    "CLIPTextEncode(Prompt)Negative0": {
-        "inputs": {
-            "text": "weird, deformed, ugly, worst quality, low contrast, cropped",
-            "clip": [
-                "LoraLoaderStack(rgthree)0",
-                1
-            ]
-        },
-        "class_type": "CLIPTextEncode",
-        "_meta": {
-            "title": "CLIP Text Encode (Prompt)Negative"
-        }
-    },
-    "CLIPTextEncode(Prompt)Positive0": {
-        "inputs": {
-            "text": "((cinematic still)) of 18 year woman talking to adult man, and another adult woman, eating dinner at a cozy home, high detail, realistic scenery",
-            "clip": [
-                "LoraLoaderStack(rgthree)0",
-                1
-            ]
-        },
-        "class_type": "CLIPTextEncode",
-        "_meta": {
-            "title": "CLIP Text Encode (Prompt)Positive"
-        }
-    },
-    "KSamplerPose0": {
-        "inputs": {
-            "seed": [
-                "Seed(rgthree)0",
-                0
-            ],
-            "steps": 6,
-            "cfg": 1.8,
-            "sampler_name": "dpmpp_sde",
-            "scheduler": "karras",
-            "denoise": 1,
-            "model": [
-                "LoadCheckpoint0",
-                0
-            ],
-            "positive": [
-                "CLIPTextEncode(Prompt)Positive0",
-                0
-            ],
-            "negative": [
-                "CLIPTextEncode(Prompt)Negative0",
-                0
-            ],
-            "latent_image": [
-                "EmptyLatentImage0",
-                0
-            ]
-        },
-        "class_type": "KSampler",
-        "_meta": {
-            "title": "KSamplerPose"
-        }
-    },
     "VAEDecode0": {
         "inputs": {
             "samples": [
@@ -426,6 +65,39 @@
             "title": "VAE Decode"
         }
     },
+    "LoadCheckpoint0": {
+        "inputs": {
+            "ckpt_name": "DreamShaperXL_Lightning.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "Load Checkpoint"
+        }
+    },
+    "Seed(rgthree)0": {
+        "inputs": {
+            "seed": 101216748829557
+        },
+        "class_type": "Seed (rgthree)",
+        "_meta": {
+            "title": "Seed (rgthree)"
+        }
+    },
+    "IPAdapterUnifiedLoaderFaceID0": {
+        "inputs": {
+            "preset": "FACEID PLUS V2",
+            "lora_strength": 0.6,
+            "provider": "CPU",
+            "model": [
+                "LoadCheckpoint0",
+                0
+            ]
+        },
+        "class_type": "IPAdapterUnifiedLoaderFaceID",
+        "_meta": {
+            "title": "IPAdapter Unified Loader FaceID"
+        }
+    },
     "DepthAnything0": {
         "inputs": {
             "ckpt_name": "depth_anything_vits14.pth",
@@ -438,119 +110,6 @@
         "class_type": "DepthAnythingPreprocessor",
         "_meta": {
             "title": "Depth Anything"
-        }
-    },
-    "DWPoseEstimator0": {
-        "inputs": {
-            "detect_hand": "disable",
-            "detect_body": "enable",
-            "detect_face": "enable",
-            "resolution": 512,
-            "bbox_detector": "yolox_l.onnx",
-            "pose_estimator": "dw-ll_ucoco.onnx",
-            "image": [
-                "VAEDecode0",
-                0
-            ]
-        },
-        "class_type": "DWPreprocessor",
-        "_meta": {
-            "title": "DWPose Estimator"
-        }
-    },
-    "FaceBoundingBox0": {
-        "inputs": {
-            "padding": 0,
-            "padding_percent": 0.2,
-            "index": -1,
-            "force_square": true,
-            "bbox_order": "left-to-right",
-            "analysis_models": [
-                "FaceAnalysisModels0",
-                0
-            ],
-            "image": [
-                "VAEDecode0",
-                0
-            ]
-        },
-        "class_type": "FaceBoundingBox",
-        "_meta": {
-            "title": "Face Bounding Box"
-        }
-    },
-    "ApplyControlNet(Advanced)0": {
-        "inputs": {
-            "strength": 0.6,
-            "start_percent": 0,
-            "end_percent": 0.8,
-            "positive": [
-                "CLIPTextEncode(Prompt)Positive0",
-                0
-            ],
-            "negative": [
-                "CLIPTextEncode(Prompt)Negative0",
-                0
-            ],
-            "control_net": [
-                "LoadControlNetModel0",
-                0
-            ],
-            "image": [
-                "DepthAnything0",
-                0
-            ]
-        },
-        "class_type": "ControlNetApplyAdvanced",
-        "_meta": {
-            "title": "Apply ControlNet (Advanced)"
-        }
-    },
-    "FaceMatcher0": {
-        "inputs": {
-            "input_faces": [
-                "MakeImageList0",
-                0
-            ],
-            "target_faces": [
-                "FaceBoundingBox0",
-                0
-            ]
-        },
-        "class_type": "FaceMatcher",
-        "_meta": {
-            "title": "Face Matcher"
-        }
-    },
-    "MaskFromPoints0": {
-        "inputs": {
-            "use_keypoints": "face+shoulders",
-            "mask_width": [
-                "Width0",
-                2
-            ],
-            "mask_height": [
-                "Height0",
-                2
-            ],
-            "n_poses": 3,
-            "dilate_iterations": 15,
-            "pose_keypoint": [
-                "DWPoseEstimator0",
-                1
-            ],
-            "mask_mapping": [
-                "FaceMatcher0",
-                0
-            ],
-            "face_bbox": [
-                "FaceBoundingBox0",
-                5
-            ]
-        },
-        "class_type": "MaskFromPoints",
-        "_meta": {
-            "title": "Mask From Points"
         }
     },
     "IPAdapterFaceID10": {
@@ -615,7 +174,199 @@
             "title": "IPAdapter FaceID 0"
         }
     },
-    "KSampler0": {
+    "IPAdapterFaceIDFace00": {
+        "inputs": {
+            "weight": 1,
+            "weight_faceidv2": 1,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                1
+            ],
+            "image": [
+                "LoadImageFace00",
+                0
+            ]
+        },
+        "class_type": "IPAdapterFaceID",
+        "_meta": {
+            "title": "IPAdapter FaceID Face0"
+        }
+    },
+    "IPAdapterFaceIDFace10": {
+        "inputs": {
+            "weight": 1,
+            "weight_faceidv2": 1,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                1
+            ],
+            "image": [
+                "LoadImageFace10",
+                0
+            ]
+        },
+        "class_type": "IPAdapterFaceID",
+        "_meta": {
+            "title": "IPAdapter FaceID Face1"
+        }
+    },
+    "FaceAnalysisModels0": {
+        "inputs": {
+            "library": "insightface",
+            "provider": "CPU"
+        },
+        "class_type": "FaceAnalysisModels",
+        "_meta": {
+            "title": "Face Analysis Models"
+        }
+    },
+    "Width0": {
+        "inputs": {
+            "number_type": "integer",
+            "number": 1024
+        },
+        "class_type": "Constant Number",
+        "_meta": {
+            "title": "Width"
+        }
+    },
+    "Height0": {
+        "inputs": {
+            "number_type": "integer",
+            "number": 1024
+        },
+        "class_type": "Constant Number",
+        "_meta": {
+            "title": "Height"
+        }
+    },
+    "UltralyticsDetectorProvider0": {
+        "inputs": {
+            "model_name": "bbox/face_yolov8m.pt"
+        },
+        "class_type": "UltralyticsDetectorProvider",
+        "_meta": {
+            "title": "UltralyticsDetectorProvider"
+        }
+    },
+    "LoadControlNetModel0": {
+        "inputs": {
+            "control_net_name": "SDXL/controlnet-depth-sdxl-1.0/diffusion_pytorch_model.safetensors"
+        },
+        "class_type": "ControlNetLoader",
+        "_meta": {
+            "title": "Load ControlNet Model"
+        }
+    },
+    "LoadImageFace00": {
+        "inputs": {
+            "image": "40-asi-man.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 0"
+        }
+    },
+    "LoadImageFace10": {
+        "inputs": {
+            "image": "cin-40-cau-fem.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 1"
+        }
+    },
+    "LoraLoaderStack(rgthree)0": {
+        "inputs": {
+            "lora_01": "None",
+            "strength_01": 1,
+            "lora_02": "None",
+            "strength_02": 1,
+            "lora_03": "None",
+            "strength_03": 1,
+            "lora_04": "None",
+            "strength_04": 1,
+            "model": [
+                "LoadCheckpoint0",
+                0
+            ],
+            "clip": [
+                "LoadCheckpoint0",
+                1
+            ]
+        },
+        "class_type": "Lora Loader Stack (rgthree)",
+        "_meta": {
+            "title": "Lora Loader Stack (rgthree)"
+        }
+    },
+    "MakeImageList0": {
+        "inputs": {
+            "image1": [
+                "LoadImageFace00",
+                0
+            ],
+            "image2": [
+                "LoadImageFace10",
+                0
+            ],
+            "image3": [
+                "LoadImageFace20",
+                0
+            ]
+        },
+        "class_type": "ImpactMakeImageList",
+        "_meta": {
+            "title": "Make Image List"
+        }
+    },
+    "CLIPTextEncode(Prompt)Negative0": {
+        "inputs": {
+            "text": "weird, deformed, ugly, worst quality, low contrast, cropped",
+            "clip": [
+                "LoraLoaderStack(rgthree)0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Negative"
+        }
+    },
+    "CLIPTextEncode(Prompt)Positive0": {
+        "inputs": {
+            "text": "((cinematic still)) of 18 year woman talking to adult man, and another adult woman, eating dinner at a cozy home, high detail, realistic scenery",
+            "clip": [
+                "LoraLoaderStack(rgthree)0",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Positive"
+        }
+    },
+    "KSamplerPose0": {
         "inputs": {
             "seed": [
                 "Seed(rgthree)0",
@@ -627,16 +378,16 @@
             "scheduler": "karras",
             "denoise": 1,
             "model": [
-                "IPAdapterFaceID00",
+                "LoadCheckpoint0",
                 0
             ],
             "positive": [
-                "ApplyControlNet(Advanced)0",
+                "CLIPTextEncode(Prompt)Positive0",
                 0
             ],
             "negative": [
-                "ApplyControlNet(Advanced)0",
-                1
+                "CLIPTextEncode(Prompt)Negative0",
+                0
             ],
             "latent_image": [
                 "EmptyLatentImage0",
@@ -645,7 +396,120 @@
         },
         "class_type": "KSampler",
         "_meta": {
-            "title": "KSampler"
+            "title": "KSamplerPose"
+        }
+    },
+    "DWPoseEstimator0": {
+        "inputs": {
+            "detect_hand": "disable",
+            "detect_body": "enable",
+            "detect_face": "enable",
+            "resolution": 512,
+            "bbox_detector": "yolox_l.onnx",
+            "pose_estimator": "dw-ll_ucoco.onnx",
+            "image": [
+                "VAEDecode0",
+                0
+            ]
+        },
+        "class_type": "DWPreprocessor",
+        "_meta": {
+            "title": "DWPose Estimator"
+        }
+    },
+    "FaceBoundingBox0": {
+        "inputs": {
+            "padding": 0,
+            "padding_percent": 0.2,
+            "index": -1,
+            "force_square": true,
+            "bbox_order": "left-to-right",
+            "analysis_models": [
+                "FaceAnalysisModels0",
+                0
+            ],
+            "image": [
+                "VAEDecode0",
+                0
+            ]
+        },
+        "class_type": "FaceBoundingBox",
+        "_meta": {
+            "title": "Face Bounding Box"
+        }
+    },
+    "FaceMatcher0": {
+        "inputs": {
+            "input_faces": [
+                "MakeImageList0",
+                0
+            ],
+            "target_faces": [
+                "FaceBoundingBox0",
+                0
+            ]
+        },
+        "class_type": "FaceMatcher",
+        "_meta": {
+            "title": "Face Matcher"
+        }
+    },
+    "ApplyControlNet(Advanced)0": {
+        "inputs": {
+            "strength": 0.6,
+            "start_percent": 0,
+            "end_percent": 0.8,
+            "positive": [
+                "CLIPTextEncode(Prompt)Positive0",
+                0
+            ],
+            "negative": [
+                "CLIPTextEncode(Prompt)Negative0",
+                0
+            ],
+            "control_net": [
+                "LoadControlNetModel0",
+                0
+            ],
+            "image": [
+                "DepthAnything0",
+                0
+            ]
+        },
+        "class_type": "ControlNetApplyAdvanced",
+        "_meta": {
+            "title": "Apply ControlNet (Advanced)"
+        }
+    },
+    "MaskFromPoints0": {
+        "inputs": {
+            "use_keypoints": "face+shoulders",
+            "mask_width": [
+                "Width0",
+                2
+            ],
+            "mask_height": [
+                "Height0",
+                2
+            ],
+            "n_poses": 3,
+            "dilate_iterations": 15,
+            "pose_keypoint": [
+                "DWPoseEstimator0",
+                1
+            ],
+            "mask_mapping": [
+                "FaceMatcher0",
+                0
+            ],
+            "face_bbox": [
+                "FaceBoundingBox0",
+                5
+            ]
+        },
+        "class_type": "MaskFromPoints",
+        "_meta": {
+            "title": "Mask From Points"
         }
     },
     "VAEDecode1": {
@@ -816,6 +680,145 @@
         "class_type": "ETN_SendImageWebSocket",
         "_meta": {
             "title": "Send Image (WebSocket)"
+        }
+    },
+    "LoadImageFace20": {
+        "inputs": {
+            "image": "18-bla-wom.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 2"
+        }
+    },
+    "IPAdapterFaceID20": {
+        "inputs": {
+            "weight": 1,
+            "weight_faceidv2": 0.7000000000000001,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                1
+            ],
+            "image": [
+                "LoadImageFace20",
+                0
+            ],
+            "attn_mask": [
+                "MaskFromPoints0",
+                3
+            ]
+        },
+        "class_type": "IPAdapterFaceID",
+        "_meta": {
+            "title": "IPAdapter FaceID 2"
+        }
+    },
+    "FaceDetailer20": {
+        "inputs": {
+            "guide_size": 800,
+            "guide_size_for": true,
+            "max_size": 1024,
+            "seed": [
+                "Seed(rgthree)0",
+                0
+            ],
+            "steps": 5,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 0.5,
+            "feather": 5,
+            "noise_mask": true,
+            "force_inpaint": true,
+            "bbox_threshold": 0.5,
+            "bbox_dilation": 10,
+            "bbox_crop_factor": 2.5,
+            "sam_detection_hint": "center-1",
+            "sam_dilation": 0,
+            "sam_threshold": 0.93,
+            "sam_bbox_expansion": 0,
+            "sam_mask_hint_threshold": 0.7000000000000001,
+            "sam_mask_hint_use_negative": "False",
+            "drop_size": 10,
+            "wildcard": "",
+            "cycle": 1,
+            "use_top_n": 1,
+            "search_mask_percentage": 0.6,
+            "inpaint_model": false,
+            "noise_mask_feather": 20,
+            "image": [
+                "FaceDetailer10",
+                0
+            ],
+            "model": [
+                "IPAdapterFaceIDFace20",
+                0
+            ],
+            "clip": [
+                "LoraLoaderStack(rgthree)0",
+                1
+            ],
+            "vae": [
+                "LoadCheckpoint0",
+                2
+            ],
+            "positive": [
+                "CLIPTextEncode(Prompt)Positive0",
+                0
+            ],
+            "negative": [
+                "CLIPTextEncode(Prompt)Negative0",
+                0
+            ],
+            "bbox_detector": [
+                "UltralyticsDetectorProvider0",
+                0
+            ],
+            "search_mask": [
+                "MaskFromPoints0",
+                3
+            ]
+        },
+        "class_type": "FaceDetailer",
+        "_meta": {
+            "title": "FaceDetailer 2"
+        }
+    },
+    "IPAdapterFaceIDFace20": {
+        "inputs": {
+            "weight": 1,
+            "weight_faceidv2": 1,
+            "weight_type": "linear",
+            "combine_embeds": "concat",
+            "start_at": 0,
+            "end_at": 1,
+            "embeds_scaling": "V only",
+            "model": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                0
+            ],
+            "ipadapter": [
+                "IPAdapterUnifiedLoaderFaceID0",
+                1
+            ],
+            "image": [
+                "LoadImageFace20",
+                0
+            ]
+        },
+        "class_type": "IPAdapterFaceID",
+        "_meta": {
+            "title": "IPAdapter FaceID Face 2"
         }
     }
 }

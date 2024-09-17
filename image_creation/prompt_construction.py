@@ -15,6 +15,23 @@ ETHNICITIES = [
 ]
 SEXES = ["man", "woman"]
 
+ETH_MAP = {
+    "bla": "black",
+    "asi": "asian",
+    "his": "hispanic",
+    "ara": "arab",
+    "ind": "indian",
+    "nat": "native american",
+    "cau": "caucasian",
+}
+SEX_MAP = {"man": "man", "wom": "woman"}
+AGES_MAP = {
+    "5": "5-year-old",
+    "18": "18-year-old",
+    "40": "40-year-old",
+    "70": "70-year-old",
+}
+
 SEX_YOUNG = {"man": "boy", "woman": "girl"}
 
 prompt_enhancements = {
@@ -26,6 +43,20 @@ def construct_mugshot_prompt(sex, age, ethnicity):
     if age == "5-year-old":
         sex = SEX_YOUNG[sex]
     return f"mugshot of a {age} {ethnicity} {sex}, detailed, high quality, full face photo, realistic, front facing, neutral background"
+
+
+def construct_identity_prompt(sex, age, ethnicity):
+    if age == "5-year-old":
+        sex = SEX_YOUNG[sex]
+    return f"face of a {age} {ethnicity} {sex}"
+
+
+def construct_identity_prompt_from_code(person_code):
+    age, ethnicity, sex = person_code.split("-")
+    age = AGES_MAP[age]
+    ethnicity = ETH_MAP[ethnicity]
+    sex = SEX_MAP[sex]
+    return construct_identity_prompt(sex, age, ethnicity)
 
 
 def get_id_code(sex, age, ethnicity):

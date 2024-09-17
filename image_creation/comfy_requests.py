@@ -19,23 +19,29 @@ load_dotenv()
 JSONHEADERS = {"Content-Type": "application/json"}
 
 COMFY_HOST = os.getenv("COMFY_HOST", "localhost")
-COMFY_PORT = os.getenv("COMFY_PORT", "7860")
+COMFY_PORT = os.getenv("COMFY_PORT", "")
 logger.info("COMFY HOST: " + COMFY_HOST)
 logger.info("COMFY PORT: " + COMFY_PORT)
 
 ws_uri_template = f"ws://{COMFY_HOST}:{COMFY_PORT}/ws?clientId={{client_id}}"
 comfy_url = f"http://{COMFY_HOST}:{COMFY_PORT}/prompt"
 
+# if COMFY_HOST.startswith('http'):
+#     comfy_url = f"{COMFY_HOST}/prompt"
+#     ws_uri_template = f"{COMFY_HOST}/ws?clientId={{client_id}}"
+
 
 async def websocket_get_image(prompt_id: str, client_id: str, verbose=False):
     imgs = []
     uri = ws_uri_template.format(client_id=client_id)
-    async with websockets.connect(uri, max_size=2**25, close_timeout=100) as ws:
+    async with websockets.connect(
+        uri, max_size=2**25, close_timeout=200, open_timeout=160, ping_timeout=100
+    ) as ws:
         st = SequentialTimer()
         while True:
             # error is thrown if timeout - happens when comfy receives identical payload
             # and caches even the websocket send image node-nothing is sent
-            out = await asyncio.wait_for(ws.recv(), timeout=90)
+            out = await asyncio.wait_for(ws.recv(), timeout=100)
 
             if isinstance(out, str):
                 message = json.loads(out)

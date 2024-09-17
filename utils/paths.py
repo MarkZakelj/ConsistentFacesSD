@@ -6,6 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(script_dir, ".."))
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 OUTPUT_DIR = os.path.join(DATA_DIR, "output")
+MODELS_DIR = os.path.join(DATA_DIR, "models")
 
 TEST_DIR = os.path.join(ROOT_DIR, "tests")
 

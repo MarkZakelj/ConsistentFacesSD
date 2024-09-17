@@ -52,7 +52,7 @@ def main():
         description="HeadPose extraction for a given subset of images."
     )
     parser.add_argument(
-        "--subset_name",
+        "--subset-name",
         type=str,
         help="The name of the subset to process images for.",
         required=False,

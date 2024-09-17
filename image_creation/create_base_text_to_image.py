@@ -76,6 +76,24 @@ configs: dict[str, dict[str, Any]] = {
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
         "png": True,
     },
+    "base_one_person_dreamshaper+face": {
+        "raw_prompts": "raw_prompts.txt",
+        "person_codes": ["PERSON1"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["face"],
+    },
+    "base_two_people_dreamshaper+face": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["face"],
+    },
+    "base_three_people_dreamshaper+face": {
+        "raw_prompts": "raw_prompts_three.txt",
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["face"],
+    },
 }
 
 
@@ -106,8 +124,6 @@ async def generate_dataset(config_name: str):
             "weird, ugly, deformed, low contrast, bad anatomy, disfigured",
         ),
     } | conf
-    print("INFO:")
-    print(json.dumps(info, indent=2))
     json.dump(info, open(os.path.join(img_save_path, "info.json"), "w"), indent=2)
 
     pbar = tqdm(total=total_images, desc="Generating images")
@@ -201,7 +217,7 @@ async def generate_dataset(config_name: str):
                 quality=80,
             )
             if conf.get("png", False):
-                img.save(
+                rgb_img.save(
                     os.path.join(img_save_path, "images_png", f"{img_num_string}.png")
                 )
             json.dump(
@@ -222,7 +238,6 @@ async def main():
     for config_name in configs:
         print(f"Generating dataset for {config_name}")
         await generate_dataset(config_name)
-        exit()
 
 
 if __name__ == "__main__":

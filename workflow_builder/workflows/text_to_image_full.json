@@ -295,7 +295,7 @@
             "sam_bbox_expansion": 0,
             "sam_mask_hint_threshold": 0.7000000000000001,
             "sam_mask_hint_use_negative": "False",
-            "drop_size": 40,
+            "drop_size": 10,
             "wildcard": "",
             "cycle": 1,
             "use_top_n": 3,
