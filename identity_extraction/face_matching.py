@@ -25,6 +25,24 @@ skip_subsets = ["identities"]
 RESNET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(1, 3, 1, 1)
 RESNET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(1, 3, 1, 1)
 
+# def mapping_compositum(mapping1: list, mapping2: list):
+#     """
+#     Combine two mappings into one
+#     :param mapping1: list of mappings [(idx1, idx2) ...]
+#     :param mapping2: list of mappings [(idx1, idx2) ...]
+#     :return: list of mappings [(idx1, idx2) ...]
+#     """
+#     mapping = {}
+#     for idx1, idx2 in mapping1:
+#         if idx2 == -1:
+#             continue
+#         mapping[idx1] = idx2
+#     for idx1, idx2 in mapping2:
+#         if idx2 == -1:
+#             continue
+#         mapping[idx1] = idx2
+#     return list(mapping.items())
+
 
 def preprocess_image(image_batch: list, resize=None):
     """

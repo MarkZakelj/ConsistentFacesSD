@@ -46,7 +46,7 @@ def calculate_similarity(subset_name: str, ids=None):
                 continue
             identity_img = get_identity_img(identity)
             target_img = get_img_from_bbox(
-                img, face["bbox"], square=True, pad=0.1, resize=256
+                img, face["bbox"], square=False, pad=0.1, resize=256
             )
             try:
                 dist = fed.analize(
@@ -75,6 +75,12 @@ def main():
         help="The name of the subset to process images for.",
         required=False,
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force the recalculation of similarity for all images.",
+        required=False,
+    )
     args = parser.parse_args()
     subset_name = args.subset_name
     all_subsets = list_directories_in_directory(OUTPUT_DIR)
@@ -82,6 +88,9 @@ def main():
         subsets = [subset_name]
     else:
         subsets = all_subsets
+    if args.force and args.subset_name is not None:
+        global FORCE
+        FORCE = True
     for subset in subsets:
         if subset not in all_subsets:
             logger.error(f"Subset {subset} does not exist.")

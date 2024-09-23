@@ -237,6 +237,47 @@ class CharactersManager(Manager):
         ] = start_at
 
 
+class CharactersManagerNormalIP(Manager):
+    def __init__(self, workflow: dict, ip_adapter_node_base_name: str):
+        """Args:
+        ----
+            workflow: the workflow dict
+            ip_adapter_node_base_name: node key in the workflow that manages the normal IPadapter  for character
+            load_image_special_name: whatever is added after 'LoadImage' in the Load Image node key, for example
+
+        """
+        super().__init__(workflow)
+        self.image_loaders = [
+            LoadImageManager(workflow, unique_name=f"Face{i}")
+            for i in range(MAX_CHARACTERS)
+        ]
+        self.ip_adapters = [
+            IPAdapter(workflow, keyname=f"{ip_adapter_node_base_name}{i}0")
+            for i in range(MAX_CHARACTERS)
+        ]
+
+    @check_character_id
+    def set_image(self, image: str, character_id: int):
+        """Set the image for a specific character
+        Args:
+            image: either base64 string of an image or image name e.g. 18-asi-mal.png
+            character_id: number of the character, 0-indexed
+        """
+        self.image_loaders[character_id].set_image(image)
+
+    @check_character_id
+    def set_weight(self, weight: float, character_id: int):
+        self.ip_adapters[character_id].set_weight(weight)
+
+    @check_character_id
+    def set_weight_type(self, weight_type: str, character_id: int):
+        self.ip_adapters[character_id].set_weight_type(weight_type)
+
+    @check_character_id
+    def set_start_at(self, start_at, character_id: int):
+        self.ip_adapters[character_id].set_start_at(start_at)
+
+
 class CharactersManagerFaceID(Manager):
     def __init__(self, workflow: dict, ip_adapter_node_base_name: str):
         """Args:

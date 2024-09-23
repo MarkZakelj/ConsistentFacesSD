@@ -43,5 +43,11 @@
   "IPAdapterFaceIDFace20": "42",
   "LoadImage(Base64)Face00": "43",
   "LoadImage(Base64)Face10": "44",
-  "LoadImage(Base64)Face20": "45"
+  "LoadImage(Base64)Face20": "45",
+  "IPAdapter10": "46",
+  "IPAdapter00": "47",
+  "IPAdapterFace00": "48",
+  "IPAdapterFace10": "49",
+  "IPAdapter20": "50",
+  "IPAdapterFace20": "51"
 }

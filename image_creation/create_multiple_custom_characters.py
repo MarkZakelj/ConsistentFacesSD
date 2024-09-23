@@ -12,7 +12,10 @@ from tqdm import tqdm
 
 from utils.imgs import image_exists, img_2_base64
 from utils.paths import DATA_DIR, OUTPUT_DIR
-from workflow_builder import MultipleCharactersFaceIdWorkflowManager
+from workflow_builder import (
+    MultipleCharactersFaceIdWorkflowManager,
+    MultipleCharactersNormalIPWorkflowManager,
+)
 from workflow_builder.workflow_utils import renumber_workflow
 
 random.seed(42)
@@ -35,6 +38,38 @@ configs: dict[str, dict[str, Any]] = {
         "person_codes": ["PERSON1", "PERSON2"],
         "checkpoint": "DreamShaperXL_Lightning.safetensors",
         "features": ["no-face-detailer"],
+    },
+    "three_people_faceid_no_facedetailer": {
+        "raw_prompts": "raw_prompts_three.txt",
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-face-detailer"],
+    },
+    "two_people_normalip": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
+    "three_people_normalip": {
+        "raw_prompts": "raw_prompts_three.txt",
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
+    "two_people_faceid_no_facematch": {
+        "raw_prompts": "raw_prompts_two.txt",
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-facematch"],
+    },
+    "three_people_faceid_no_facematch": {
+        "raw_prompts": "raw_prompts_three.txt",
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-facematch"],
     },
 }
 
@@ -93,10 +128,16 @@ async def generate_dataset(config_name: str):
 
             img_info = {"prompt": prompt, "seed": seed}
             # wf = TwoCharactersFaceIdWorkflowManager()
-
-            wf = MultipleCharactersFaceIdWorkflowManager(
-                n_characters=n_people, features=conf.get("features", [])
-            )
+            iptype = conf.get("iptype", "faceid")
+            match iptype:
+                case "faceid":
+                    wf = MultipleCharactersFaceIdWorkflowManager(
+                        n_characters=n_people, features=conf.get("features", [])
+                    )
+                case "normal":
+                    wf = MultipleCharactersNormalIPWorkflowManager(
+                        n_characters=n_people, features=conf.get("features", [])
+                    )
             wf.basic.set_prompt(prompt)
             wf.basic.set_seed(seed)
 
@@ -121,13 +162,13 @@ async def generate_dataset(config_name: str):
 
             for p, profile_image in enumerate(profile_images):
                 wf.character.set_image(img_2_base64(profile_image), p)
-                wf.character.set_weight(1.0, p)
-                wf.character.set_weight_v2(0.7, p)
+                wf.character.set_weight(conf.get("ip_weight", 1.0), p)
+                if iptype == "faceid":
+                    wf.character.set_weight_v2(0.7, p)
 
             wf.trim_workflow()
 
             if img_num == 0:
-                print(json.dumps(wf.get_workflow(), indent=2))
                 json.dump(
                     wf.get_workflow(),
                     open(os.path.join(img_save_path, "workflow.json"), "w"),

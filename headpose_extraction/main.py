@@ -38,6 +38,8 @@ def extract_all_headposes_on_subset(subset_name: str):
         info = get_img_info(subset_name, i)
         face_imgs = get_face_imgs(subset_name, i)
         for k, face_img in enumerate(face_imgs):
+            if "head_pose" in info["face_info"][k] and not FORCE:
+                continue
             pitch, yaw, roll = extract_headpose(face_img)
             info["face_info"][k]["head_pose"] = {
                 "pitch": float(pitch),

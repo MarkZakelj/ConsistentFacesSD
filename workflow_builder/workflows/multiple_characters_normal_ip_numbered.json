@@ -1,0 +1,804 @@
+{
+    "1": {
+        "inputs": {
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 6,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 1,
+            "model": [
+                "47",
+                0
+            ],
+            "positive": [
+                "32",
+                0
+            ],
+            "negative": [
+                "32",
+                1
+            ],
+            "latent_image": [
+                "2",
+                0
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSampler"
+        }
+    },
+    "2": {
+        "inputs": {
+            "width": [
+                "18",
+                2
+            ],
+            "height": [
+                "19",
+                2
+            ],
+            "batch_size": 1
+        },
+        "class_type": "EmptyLatentImage",
+        "_meta": {
+            "title": "Empty Latent Image"
+        }
+    },
+    "5": {
+        "inputs": {
+            "samples": [
+                "28",
+                0
+            ],
+            "vae": [
+                "6",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "6": {
+        "inputs": {
+            "ckpt_name": "DreamShaperXL_Lightning.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple",
+        "_meta": {
+            "title": "Load Checkpoint"
+        }
+    },
+    "7": {
+        "inputs": {
+            "seed": 101216748829557
+        },
+        "class_type": "Seed (rgthree)",
+        "_meta": {
+            "title": "Seed (rgthree)"
+        }
+    },
+    "9": {
+        "inputs": {
+            "preset": "PLUS FACE (portraits)",
+            "model": [
+                "6",
+                0
+            ]
+        },
+        "class_type": "IPAdapterUnifiedLoader",
+        "_meta": {
+            "title": "IPAdapter Unified Loader"
+        }
+    },
+    "12": {
+        "inputs": {
+            "ckpt_name": "depth_anything_vits14.pth",
+            "resolution": 512,
+            "image": [
+                "5",
+                0
+            ]
+        },
+        "class_type": "DepthAnythingPreprocessor",
+        "_meta": {
+            "title": "Depth Anything"
+        }
+    },
+    "46": {
+        "inputs": {
+            "weight": 0.5,
+            "start_at": 0,
+            "end_at": 1,
+            "weight_type": "standard",
+            "model": [
+                "50",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "23",
+                0
+            ],
+            "attn_mask": [
+                "33",
+                2
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter  1"
+        }
+    },
+    "47": {
+        "inputs": {
+            "weight": 0.5,
+            "start_at": 0,
+            "end_at": 1,
+            "weight_type": "standard",
+            "model": [
+                "46",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "22",
+                0
+            ],
+            "attn_mask": [
+                "33",
+                1
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter 0"
+        }
+    },
+    "48": {
+        "inputs": {
+            "weight": 0.5,
+            "start_at": 0,
+            "end_at": 1,
+            "weight_type": "standard",
+            "model": [
+                "9",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "22",
+                0
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter Face0"
+        }
+    },
+    "49": {
+        "inputs": {
+            "weight": 0.5,
+            "start_at": 0,
+            "end_at": 1,
+            "weight_type": "standard",
+            "model": [
+                "9",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "23",
+                0
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter Face1"
+        }
+    },
+    "17": {
+        "inputs": {
+            "library": "insightface",
+            "provider": "CPU"
+        },
+        "class_type": "FaceAnalysisModels",
+        "_meta": {
+            "title": "Face Analysis Models"
+        }
+    },
+    "18": {
+        "inputs": {
+            "number_type": "integer",
+            "number": 1024
+        },
+        "class_type": "Constant Number",
+        "_meta": {
+            "title": "Width"
+        }
+    },
+    "19": {
+        "inputs": {
+            "number_type": "integer",
+            "number": 1024
+        },
+        "class_type": "Constant Number",
+        "_meta": {
+            "title": "Height"
+        }
+    },
+    "20": {
+        "inputs": {
+            "model_name": "bbox/face_yolov8m.pt"
+        },
+        "class_type": "UltralyticsDetectorProvider",
+        "_meta": {
+            "title": "UltralyticsDetectorProvider"
+        }
+    },
+    "21": {
+        "inputs": {
+            "control_net_name": "SDXL/controlnet-depth-sdxl-1.0/diffusion_pytorch_model.safetensors"
+        },
+        "class_type": "ControlNetLoader",
+        "_meta": {
+            "title": "Load ControlNet Model"
+        }
+    },
+    "22": {
+        "inputs": {
+            "image": "40-asi-man.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 0"
+        }
+    },
+    "23": {
+        "inputs": {
+            "image": "cin-40-cau-fem.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 1"
+        }
+    },
+    "24": {
+        "inputs": {
+            "lora_01": "None",
+            "strength_01": 1,
+            "lora_02": "None",
+            "strength_02": 1,
+            "lora_03": "None",
+            "strength_03": 1,
+            "lora_04": "None",
+            "strength_04": 1,
+            "model": [
+                "6",
+                0
+            ],
+            "clip": [
+                "6",
+                1
+            ]
+        },
+        "class_type": "Lora Loader Stack (rgthree)",
+        "_meta": {
+            "title": "Lora Loader Stack (rgthree)"
+        }
+    },
+    "25": {
+        "inputs": {
+            "image1": [
+                "22",
+                0
+            ],
+            "image2": [
+                "23",
+                0
+            ],
+            "image3": [
+                "39",
+                0
+            ]
+        },
+        "class_type": "ImpactMakeImageList",
+        "_meta": {
+            "title": "Make Image List"
+        }
+    },
+    "26": {
+        "inputs": {
+            "text": "weird, deformed, ugly, worst quality, low contrast, cropped",
+            "clip": [
+                "24",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Negative"
+        }
+    },
+    "27": {
+        "inputs": {
+            "text": "((cinematic still)) of 18 year woman talking to adult man, and another adult woman, eating dinner at a cozy home, high detail, realistic scenery",
+            "clip": [
+                "24",
+                1
+            ]
+        },
+        "class_type": "CLIPTextEncode",
+        "_meta": {
+            "title": "CLIP Text Encode (Prompt)Positive"
+        }
+    },
+    "28": {
+        "inputs": {
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 6,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 1,
+            "model": [
+                "6",
+                0
+            ],
+            "positive": [
+                "27",
+                0
+            ],
+            "negative": [
+                "26",
+                0
+            ],
+            "latent_image": [
+                "2",
+                0
+            ]
+        },
+        "class_type": "KSampler",
+        "_meta": {
+            "title": "KSamplerPose"
+        }
+    },
+    "29": {
+        "inputs": {
+            "detect_hand": "disable",
+            "detect_body": "enable",
+            "detect_face": "enable",
+            "resolution": 512,
+            "bbox_detector": "yolox_l.onnx",
+            "pose_estimator": "dw-ll_ucoco.onnx",
+            "image": [
+                "5",
+                0
+            ]
+        },
+        "class_type": "DWPreprocessor",
+        "_meta": {
+            "title": "DWPose Estimator"
+        }
+    },
+    "30": {
+        "inputs": {
+            "padding": 0,
+            "padding_percent": 0.2,
+            "index": -1,
+            "force_square": true,
+            "bbox_order": "left-to-right",
+            "analysis_models": [
+                "17",
+                0
+            ],
+            "image": [
+                "5",
+                0
+            ]
+        },
+        "class_type": "FaceBoundingBox",
+        "_meta": {
+            "title": "Face Bounding Box"
+        }
+    },
+    "31": {
+        "inputs": {
+            "input_faces": [
+                "25",
+                0
+            ],
+            "target_faces": [
+                "30",
+                0
+            ]
+        },
+        "class_type": "FaceMatcher",
+        "_meta": {
+            "title": "Face Matcher"
+        }
+    },
+    "32": {
+        "inputs": {
+            "strength": 0.6,
+            "start_percent": 0,
+            "end_percent": 0.8,
+            "positive": [
+                "27",
+                0
+            ],
+            "negative": [
+                "26",
+                0
+            ],
+            "control_net": [
+                "21",
+                0
+            ],
+            "image": [
+                "12",
+                0
+            ]
+        },
+        "class_type": "ControlNetApplyAdvanced",
+        "_meta": {
+            "title": "Apply ControlNet (Advanced)"
+        }
+    },
+    "33": {
+        "inputs": {
+            "use_keypoints": "face+shoulders",
+            "mask_width": [
+                "18",
+                2
+            ],
+            "mask_height": [
+                "19",
+                2
+            ],
+            "n_poses": 3,
+            "dilate_iterations": 15,
+            "pose_keypoint": [
+                "29",
+                1
+            ],
+            "mask_mapping": [
+                "31",
+                0
+            ],
+            "face_bbox": [
+                "30",
+                5
+            ]
+        },
+        "class_type": "MaskFromPoints",
+        "_meta": {
+            "title": "Mask From Points"
+        }
+    },
+    "34": {
+        "inputs": {
+            "samples": [
+                "1",
+                0
+            ],
+            "vae": [
+                "6",
+                2
+            ]
+        },
+        "class_type": "VAEDecode",
+        "_meta": {
+            "title": "VAE Decode"
+        }
+    },
+    "35": {
+        "inputs": {
+            "guide_size": 800,
+            "guide_size_for": true,
+            "max_size": 1024,
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 5,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 0.5,
+            "feather": 5,
+            "noise_mask": true,
+            "force_inpaint": false,
+            "bbox_threshold": 0.5,
+            "bbox_dilation": 20,
+            "bbox_crop_factor": 2.5,
+            "sam_detection_hint": "center-1",
+            "sam_dilation": 0,
+            "sam_threshold": 0.93,
+            "sam_bbox_expansion": 0,
+            "sam_mask_hint_threshold": 0.7000000000000001,
+            "sam_mask_hint_use_negative": "False",
+            "drop_size": 10,
+            "wildcard": "",
+            "cycle": 1,
+            "use_top_n": 1,
+            "search_mask_percentage": 0.5,
+            "inpaint_model": 20,
+            "noise_mask_feather": 20,
+            "image": [
+                "34",
+                0
+            ],
+            "model": [
+                "48",
+                0
+            ],
+            "clip": [
+                "24",
+                1
+            ],
+            "vae": [
+                "6",
+                2
+            ],
+            "positive": [
+                "27",
+                0
+            ],
+            "negative": [
+                "26",
+                0
+            ],
+            "bbox_detector": [
+                "20",
+                0
+            ],
+            "search_mask": [
+                "33",
+                1
+            ]
+        },
+        "class_type": "FaceDetailer",
+        "_meta": {
+            "title": "FaceDetailer 0"
+        }
+    },
+    "36": {
+        "inputs": {
+            "guide_size": 800,
+            "guide_size_for": true,
+            "max_size": 1024,
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 5,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 0.5,
+            "feather": 5,
+            "noise_mask": true,
+            "force_inpaint": true,
+            "bbox_threshold": 0.5,
+            "bbox_dilation": 20,
+            "bbox_crop_factor": 2.5,
+            "sam_detection_hint": "center-1",
+            "sam_dilation": 0,
+            "sam_threshold": 0.93,
+            "sam_bbox_expansion": 0,
+            "sam_mask_hint_threshold": 0.7000000000000001,
+            "sam_mask_hint_use_negative": "False",
+            "drop_size": 10,
+            "wildcard": "",
+            "cycle": 1,
+            "use_top_n": 1,
+            "search_mask_percentage": 0.5,
+            "inpaint_model": false,
+            "noise_mask_feather": 20,
+            "image": [
+                "35",
+                0
+            ],
+            "model": [
+                "49",
+                0
+            ],
+            "clip": [
+                "24",
+                1
+            ],
+            "vae": [
+                "6",
+                2
+            ],
+            "positive": [
+                "27",
+                0
+            ],
+            "negative": [
+                "26",
+                0
+            ],
+            "bbox_detector": [
+                "20",
+                0
+            ],
+            "search_mask": [
+                "33",
+                2
+            ]
+        },
+        "class_type": "FaceDetailer",
+        "_meta": {
+            "title": "FaceDetailer 1"
+        }
+    },
+    "37": {
+        "inputs": {
+            "images": [
+                "41",
+                0
+            ]
+        },
+        "class_type": "ETN_SendImageWebSocket",
+        "_meta": {
+            "title": "Send Image (WebSocket)"
+        }
+    },
+    "39": {
+        "inputs": {
+            "image": "18-bla-wom.png",
+            "upload": "image"
+        },
+        "class_type": "LoadImage",
+        "_meta": {
+            "title": "Load Image Face 2"
+        }
+    },
+    "50": {
+        "inputs": {
+            "weight": 0.5,
+            "start_at": 0,
+            "end_at": 1,
+            "weight_type": "standard",
+            "model": [
+                "9",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "39",
+                0
+            ],
+            "attn_mask": [
+                "33",
+                3
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter 2"
+        }
+    },
+    "41": {
+        "inputs": {
+            "guide_size": 800,
+            "guide_size_for": true,
+            "max_size": 1024,
+            "seed": [
+                "7",
+                0
+            ],
+            "steps": 5,
+            "cfg": 1.8,
+            "sampler_name": "dpmpp_sde",
+            "scheduler": "karras",
+            "denoise": 0.5,
+            "feather": 5,
+            "noise_mask": true,
+            "force_inpaint": true,
+            "bbox_threshold": 0.5,
+            "bbox_dilation": 10,
+            "bbox_crop_factor": 2.5,
+            "sam_detection_hint": "center-1",
+            "sam_dilation": 0,
+            "sam_threshold": 0.93,
+            "sam_bbox_expansion": 0,
+            "sam_mask_hint_threshold": 0.7000000000000001,
+            "sam_mask_hint_use_negative": "False",
+            "drop_size": 10,
+            "wildcard": "",
+            "cycle": 1,
+            "use_top_n": 1,
+            "search_mask_percentage": 0.6,
+            "inpaint_model": false,
+            "noise_mask_feather": 20,
+            "image": [
+                "36",
+                0
+            ],
+            "model": [
+                "51",
+                0
+            ],
+            "clip": [
+                "24",
+                1
+            ],
+            "vae": [
+                "6",
+                2
+            ],
+            "positive": [
+                "27",
+                0
+            ],
+            "negative": [
+                "26",
+                0
+            ],
+            "bbox_detector": [
+                "20",
+                0
+            ],
+            "search_mask": [
+                "33",
+                3
+            ]
+        },
+        "class_type": "FaceDetailer",
+        "_meta": {
+            "title": "FaceDetailer 2"
+        }
+    },
+    "51": {
+        "inputs": {
+            "weight": 0.5,
+            "weight_type": "standard",
+            "start_at": 0,
+            "end_at": 1,
+            "model": [
+                "9",
+                0
+            ],
+            "ipadapter": [
+                "9",
+                1
+            ],
+            "image": [
+                "39",
+                0
+            ]
+        },
+        "class_type": "IPAdapter",
+        "_meta": {
+            "title": "IPAdapter Face 2"
+        }
+    }
+}

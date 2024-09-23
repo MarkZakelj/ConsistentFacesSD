@@ -13,7 +13,7 @@ from utils import list_directories_in_directory
 from utils.imgs import pad_bbox, square_bbox, update_img_info
 from utils.paths import OUTPUT_DIR
 
-font = ImageFont.truetype("Arial", size=24)
+font = ImageFont.truetype("Arial", size=19)
 font_small = ImageFont.truetype("Arial", size=18)
 # Configuration dictionary (you can modify this as needed)
 config = {
@@ -37,7 +37,12 @@ colors = ["red", "green", "blue", "black"]
 
 
 def draw_bounding_box(
-    image, face_infos, show_identity=False, show_number=False, identity_similarity=False
+    image,
+    face_infos,
+    show_identity=False,
+    show_number=False,
+    identity_similarity=False,
+    face_quality=False,
 ):
     draw = ImageDraw.Draw(image)
     image_size = (image.size[1], image.size[0])
@@ -48,18 +53,37 @@ def draw_bounding_box(
         draw.rectangle(bbox, outline=colors[i % len(colors)], width=3)
         if show_number:
             draw.text(
-                (bbox[0], bbox[1] - 15), f"{i + 1}", fill="white", font=font_small
+                (bbox[0], bbox[1] - 20), f"{i + 1}", fill="white", font=font_small
             )
+        all_text = ""
+        identity = None
         if show_identity:
             text = info.get("identity", "unknown")
             if not text:
                 text = "unknown"
+            else:
+                identity = text
+            all_text += text
             fill = "gray" if text == "unknown" else "white"
-            draw.text((bbox[0], bbox[1]), text, fill=fill, font=font)
+            if not identity_similarity:
+                draw.text((bbox[0], bbox[1] - 13), text, fill=fill, font=font)
         if identity_similarity:
             text = f"{info.get('similarity_cosine', -1):.2f}"
-            fill = "white" if info.get("similarity_cosine", -1) > 0.0 else "gray"
-            draw.text((bbox[0], bbox[1] + 20), text, fill=fill, font=font)
+            show = info.get("similarity_cosine", -1) > 0.0
+            fill = "white" if show else "gray"
+            all_text += f" {text}"
+            position = (bbox[0], bbox[1] - 16)
+            left, top, right, bottom = draw.textbbox(position, all_text, font=font)
+            if identity:
+                draw.rectangle((left - 2, top - 2, right + 2, bottom), fill="black")
+                draw.text(position, all_text, fill=fill, font=font)
+        if face_quality:
+            text = f"{info.get('face_quality', -1):.2f}"
+            position = (bbox[0], bbox[3])
+            left, top, right, bottom = draw.textbbox(position, all_text, font=font)
+            draw.rectangle((left - 2, top - 2, right + 2, bottom), fill="black")
+            draw.text(position, text, fill="white", font=font)
+
     return image
 
 
@@ -148,7 +172,9 @@ def main():
     # Show prompts option
     show_prompts = st.sidebar.checkbox("Show prompts", key="show_prompts")
 
-    show_poses = st.sidebar.checkbox("Show poses", key="show_poses")
+    show_face_quality = st.sidebar.checkbox(
+        "Show face quality", key="show_face_quality"
+    )
     show_headposes = st.sidebar.checkbox("Show headposes", key="show_headposes")
     # Show face bounding boxes option
     show_bboxes = st.sidebar.checkbox("Show face bounding boxes", key="show_bboxes")
@@ -224,10 +250,11 @@ def main():
                             show_identity=show_identity,
                             show_number=show_bbox_num,
                             identity_similarity=show_identity_similarity,
+                            face_quality=show_face_quality,
                         )
 
-                    if show_poses and "pose_info" in img_info:
-                        img = draw_poses(img, img_info["pose_info"])
+                    # if show_poses and "pose_info" in img_info:
+                    #     img = draw_poses(img, img_info["pose_info"])
 
                     if show_headposes and "face_info" in img_info:
                         img = draw_headposes(img, img_info["face_info"])

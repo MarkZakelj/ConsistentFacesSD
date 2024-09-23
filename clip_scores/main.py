@@ -15,7 +15,7 @@ from utils.imgs import (
 )
 from utils.paths import OUTPUT_DIR
 
-FORCE = True
+FORCE = False
 
 skip_subsets = ["identities"]
 clip_version = "openai/clip-vit-base-patch16"

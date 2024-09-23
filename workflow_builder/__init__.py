@@ -3,6 +3,7 @@ from .full_manager import (
     FaceStyleTransferWorkflowManager,
     MCFaceIDFaceSwapWorkflowManager,
     MultipleCharactersFaceIdWorkflowManager,
+    MultipleCharactersNormalIPWorkflowManager,
     MultipleCharactersWorkflowManager,
     TextToImageWorkflowManager,
     TwoCharactersFaceIdWorkflowManager,

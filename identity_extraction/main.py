@@ -63,6 +63,33 @@ def delete_info(subset_name: str):
         update_img_info(subset_name, i, info)
 
 
+def label_left_to_right(subset_name: str):
+    if subset_name in skip_subsets:
+        return
+    logger.info("SUBSET NAME: " + subset_name)
+
+    subset_info = get_subset_info(subset_name)
+    n_people = len(subset_info["person_codes"])
+    prompt_seed_pairs = get_prompt_seed_pairs(n_people)
+
+    n_images = get_number_of_images(subset_name)
+    for i in tqdm(range(n_images)):
+        info = get_img_info(subset_name, i)
+        if "face_info" not in info:
+            continue
+        person_codes = list(prompt_seed_pairs[i]["people"].values())
+        face_info = sorted(
+            [face_info for face_info in info["face_info"]],
+            key=lambda x: (x["bbox"][0] + x["bbox"][2]) / 2,
+        )
+
+        for k, face in enumerate(face_info):
+            if k >= len(person_codes):
+                break
+            face["identity"] = person_codes[k]
+        update_img_info(subset_name, i, info)
+
+
 def extract_all_identities_on_subset(subset_name: str):
     if subset_name in skip_subsets:
         return
@@ -114,6 +141,7 @@ def main():
         help="The name of the subset to process images for.",
         required=False,
     )
+    parser.add_argument("--use-first-bbox", action="store_true", required=False)
     parser.add_argument("--delete", action="store_true", required=False)
     args = parser.parse_args()
     subset_name = args.subset_name
@@ -127,7 +155,10 @@ def main():
         print("You need to specify a subset to delete identities from.")
         return
     for subset in subsets:
-        extract_all_identities_on_subset(subset)
+        if args.use_first_bbox:
+            label_left_to_right(subset)
+        else:
+            extract_all_identities_on_subset(subset)
 
 
 if __name__ == "__main__":

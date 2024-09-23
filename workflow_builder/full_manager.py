@@ -8,6 +8,7 @@ from .manager_modules import (
     BasicManager,
     CharactersManager,
     CharactersManagerFaceID,
+    CharactersManagerNormalIP,
     LoadImageManager,
     PoseManager,
     PoseMaskManager,
@@ -177,7 +178,7 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
         if features is None:
             features = []
 
-        check_valid_features(features, {"no-face-detailer"})
+        check_valid_features(features, {"no-face-detailer", "no-facematch"})
 
         self.workflow = load_workflow("multiple_characters_workflow_full.json")
 
@@ -191,6 +192,39 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
         self.pose_mask.set_n_poses(10)
         for i in range(n_characters, MAX_CHARACTERS):
             wfu.skip_node(f"IPAdapterFaceID{i}0", [("model", 0)], self.workflow)
+            wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
+            wfu.remove_inputs("MakeImageList0", [f"image{i+1}"], self.workflow)
+
+        if "no-face-detailer" in features:
+            for i in range(n_characters):
+                wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
+
+        if "no-facematch" in features:
+            wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
+
+
+class MultipleCharactersNormalIPWorkflowManager(FullManager):
+    def __init__(self, n_characters: int, features=None):
+        super().__init__()
+        if features is None:
+            features = []
+
+        check_valid_features(features, {"no-face-detailer"})
+
+        self.workflow = load_workflow(
+            "multiple_characters_normal_ip_workflow_full.json"
+        )
+
+        self.basic: BasicManager = BasicManager(workflow=self.workflow)
+        self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
+        self.pose_mask: PoseMaskManager = PoseMaskManager(workflow=self.workflow)
+        self.character: CharactersManagerNormalIP = CharactersManagerNormalIP(
+            workflow=self.workflow, ip_adapter_node_base_name="IPAdapter"
+        )
+
+        self.pose_mask.set_n_poses(10)
+        for i in range(n_characters, MAX_CHARACTERS):
+            wfu.skip_node(f"IPAdapter{i}0", [("model", 0)], self.workflow)
             wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
             wfu.remove_inputs("MakeImageList0", [f"image{i+1}"], self.workflow)
 
