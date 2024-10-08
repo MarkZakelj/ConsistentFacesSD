@@ -61,7 +61,16 @@ def main():
         help="The name of the subset to process images for.",
         required=False,
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force recompute CLIP score for all images.",
+        required=False,
+    )
     args = parser.parse_args()
+    if args.force:
+        global FORCE
+        FORCE = True
     subset_name = args.subset_name
     subsets = list_directories_in_directory(OUTPUT_DIR)
     if subset_name is not None:

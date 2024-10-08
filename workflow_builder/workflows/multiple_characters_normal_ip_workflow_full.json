@@ -409,7 +409,7 @@
             "padding_percent": 0.2,
             "index": -1,
             "force_square": true,
-            "bbox_order": "left-to-right",
+            "bbox_order": "big-to-small",
             "analysis_models": [
                 "FaceAnalysisModels0",
                 0

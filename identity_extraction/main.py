@@ -104,6 +104,14 @@ def extract_all_identities_on_subset(subset_name: str):
         info = get_img_info(subset_name, i)
         if "face_info" not in info:
             continue
+        face_info = info["face_info"]
+        cont = True
+        for face in face_info:
+            if "identity" in face and face["identity"] and not FORCE:
+                cont = False
+                break
+        if not cont:
+            continue
         person_codes = list(prompt_seed_pairs[i]["people"].values())
         identity_prompts = []
         for person_code in person_codes:

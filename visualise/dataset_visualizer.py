@@ -102,6 +102,13 @@ def draw_img_num(image, img_num):
     return image
 
 
+def draw_clip_score(image, score):
+    draw = ImageDraw.Draw(image)
+    w, h = image.size
+    draw.text((w - 50, h - 22), f"{score}", fill="white", font=font)
+    return image
+
+
 def draw_headposes(image, face_infos):
     image = np.array(image)
     for i, info in enumerate(face_infos):
@@ -172,6 +179,8 @@ def main():
     # Show prompts option
     show_prompts = st.sidebar.checkbox("Show prompts", key="show_prompts")
 
+    show_clip_scores = st.sidebar.checkbox("Show clip scores", key="show_clip_scores")
+
     show_face_quality = st.sidebar.checkbox(
         "Show face quality", key="show_face_quality"
     )
@@ -188,6 +197,12 @@ def main():
     )
     change_face_identities = st.sidebar.checkbox(
         "Change face identities", key="change_face_identities"
+    )
+    change_n_people_front = st.sidebar.checkbox(
+        "Change n_people_front", key="change_n_people_front"
+    )
+    only_show_off_people = st.sidebar.checkbox(
+        "Only show off people", key="only_show_off_people"
     )
     show_seed = st.sidebar.checkbox("Show seed", key="show_seed")
     # Create columns based on user selection
@@ -211,8 +226,10 @@ def main():
 
                 # Read and display info.json
                 info_json_path = os.path.join(dataset_path, "info.json")
+                n_target_people = -1
                 if os.path.exists(info_json_path):
                     info = load_json(info_json_path)
+                    n_target_people = len(info.get("person_codes", []))
                     with st.expander("Dataset Info:"):
                         for key, value in info.items():
                             st.write(f"{key}: {value}")
@@ -259,12 +276,35 @@ def main():
                     if show_headposes and "face_info" in img_info:
                         img = draw_headposes(img, img_info["face_info"])
                     img = draw_img_num(img, img_num)
+                    if show_clip_scores:
+                        clip_score = img_info.get("clip_score", {}).get(
+                            "openai/clip-vit-base-patch16", 0
+                        )
+                        img = draw_clip_score(img, clip_score)
                     with st.container():
-                        st.image(img, use_column_width=True)
+                        if only_show_off_people:
+                            if img_info.get("n_people_front", 0) != n_target_people:
+                                st.image(img, use_column_width=True)
+                        else:
+                            st.image(img, use_column_width=True)
                         if show_prompts and img_info:
                             st.write(f"Prompt: {img_info.get('prompt', 'N/A')}")
                         if show_seed and img_info:
                             st.write(f"Seed: {img_info.get('seed', 'N/A')}")
+
+                        if change_n_people_front:
+                            n_people_front = st.number_input(
+                                "Number of people in front",
+                                value=img_info.get("n_people_front", 0),
+                                key=f"n_people_front_{img_num}_{dataset_path}",
+                            )
+                            img_info["n_people_front"] = n_people_front
+                            if st.button(
+                                "Save n_people_front",
+                                key=f"save_n_people_front_{img_num}_{dataset_path}",
+                            ):
+                                update_img_info(dataset, img_num, img_info)
+                                st.rerun()
 
                         if change_face_identities:
                             for j, info in enumerate(img_info.get("face_info", [])):

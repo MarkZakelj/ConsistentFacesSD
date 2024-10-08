@@ -209,7 +209,7 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
         if features is None:
             features = []
 
-        check_valid_features(features, {"no-face-detailer"})
+        check_valid_features(features, {"no-face-detailer", "no-facematch"})
 
         self.workflow = load_workflow(
             "multiple_characters_normal_ip_workflow_full.json"
@@ -231,6 +231,9 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
         if "no-face-detailer" in features:
             for i in range(n_characters):
                 wfu.skip_node(f"FaceDetailer{i}0", [("image", 0)], self.workflow)
+
+        if "no-facematch" in features:
+            wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
 
 
 class MCFaceIDFaceSwapWorkflowManager(FullManager):

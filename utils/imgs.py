@@ -89,6 +89,12 @@ def get_img_info(subset_name: str, img_code: int | str):
 
 
 def get_img(subset_name: str, img_code: int | str):
+    """
+    Get the image from the subset. numpy format, HWC-RGB-uint8
+    :param subset_name:
+    :param img_code:
+    :return:
+    """
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     img_path = os.path.join(sub_dir, "images", prepare_img_code(img_code) + ".jpg")
     img = cv2.imread(img_path)[..., [2, 1, 0]]  # BGR to RGB
@@ -154,8 +160,14 @@ def update_img_info(
 
 
 def get_number_of_images(subset_name: str):
+    if not subset_exists(subset_name):
+        raise ValueError(f"Subset {subset_name} does not exist")
     sub_dir = os.path.join(OUTPUT_DIR, subset_name)
     return count_images_in_dir(os.path.join(sub_dir, "images"))
+
+
+def subset_exists(subset_name: str):
+    return os.path.exists(os.path.join(OUTPUT_DIR, subset_name))
 
 
 def get_image_paths(subset_name: str, img_folder: str = "images"):

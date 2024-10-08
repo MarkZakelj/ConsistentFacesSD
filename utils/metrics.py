@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from utils.imgs import get_bbox_size, get_img_info, get_number_of_images
@@ -14,6 +15,9 @@ def construct_dataframe(subset_name: str):
                 "subset": subset_name,
                 "image_id": i,
                 "clip_score": clip_score.get("openai/clip-vit-base-patch16"),
+                "quality": info.get("clip_iqa", {}).get("quality"),
+                "natural": info.get("clip_iqa", {}).get("natural"),
+                "n_people_front": info.get("n_people_front", 0),
             }
         )
     df = pd.DataFrame(data)
@@ -51,3 +55,16 @@ def construct_dataframe_faces(subset_name: str):
     df = pd.DataFrame(data)
     df["bbox_size"] = df["bbox"].apply(lambda x: get_bbox_size(x))
     return df
+
+
+def get_dataframe_faces(subset_name: str, identity_only: bool = True):
+    df_raw = construct_dataframe_faces(subset_name)
+    if identity_only:
+        df_raw[df_raw["identity"] == ""] = np.nan
+        df_raw = df_raw.dropna(subset=["identity"])
+    return df_raw
+
+
+def get_dataframe(subset_name: str):
+    df_raw = construct_dataframe(subset_name)
+    return df_raw

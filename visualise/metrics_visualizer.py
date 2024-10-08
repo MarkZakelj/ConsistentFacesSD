@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 
 from utils import list_directories_in_directory
-from utils.metrics import construct_dataframe, construct_dataframe_faces
+from utils.metrics import get_dataframe, get_dataframe_faces
 from utils.paths import OUTPUT_DIR
 
 # def create_bar_chart(df: pd.DataFrame, x: str, y: str, title: str):
@@ -22,18 +22,6 @@ from utils.paths import OUTPUT_DIR
 #     return fig
 
 
-def get_dataframe_faces(subset_name: str, identity_only: bool = True):
-    df_raw = construct_dataframe_faces(subset_name)
-    if identity_only:
-        df_raw = df_raw.dropna(subset=["identity"])
-    return df_raw
-
-
-def get_dataframe(subset_name: str):
-    df_raw = construct_dataframe(subset_name)
-    return df_raw
-
-
 def main():
     st.title("Metrics Visualizer")
     t1, t2, t3 = st.tabs(["face similarity", "clip score", "bbox sizes"])
@@ -49,13 +37,14 @@ def main():
             st.write(
                 f"Selected experiments for face similarity: {', '.join(selected_experiments_t1)}"
             )
-            dfs = pd.concat(
+            df_raw = pd.concat(
                 [
                     get_dataframe_faces(subset_name)
                     for subset_name in selected_experiments_t1
                 ],
                 axis=0,
             )
+            dfs = df_raw.copy()
             dfs = dfs.groupby("subset")["similarity_cosine"].agg(
                 [
                     ("mean", "mean"),
@@ -66,6 +55,22 @@ def main():
             st.dataframe(dfs)
             fig = px.bar(dfs, y="mean", error_y="stderr")
             st.plotly_chart(fig)
+            fig_box = px.box(df_raw, y="similarity_cosine", x="subset")
+            fig_box.update_layout(
+                yaxis_title="Cosine similarity",
+                xaxis_title="Method",
+                title="Cosine similarity per method for three people generation",
+                xaxis=dict(
+                    tickmode="array",
+                    tickvals=[0, 1, 2],  # Position of tick marks
+                    ticktext=[
+                        "IPAdapter Plus FaceID v2",
+                        "IPAdapter Plus Face",
+                        "Prompt Alone",
+                    ],  # Labels for tick marks
+                ),
+            )
+            st.plotly_chart(fig_box)
             # Add your logic here to process and display face similarity data for selected experiments
 
     with t2:

@@ -4,6 +4,8 @@ import random
 random.seed(42)
 
 AGES = ["5-year-old", "18-year-old", "40-year-old", "70-year-old"]
+CHILDREN = ["5-year-old"]
+ADULTS = ["18-year-old", "40-year-old", "70-year-old"]
 ETHNICITIES = [
     "black",
     "asian",
@@ -34,9 +36,20 @@ AGES_MAP = {
 
 SEX_YOUNG = {"man": "boy", "woman": "girl"}
 
+
+NUM_TO_WORD = {
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+}
+
 prompt_enhancements = {
     "cinematic still": "(cinematic still) of {prompt} . high quality, detailed photograph, (visible face:0.8)",
 }
+
+NSEEDS = 5
 
 
 def construct_mugshot_prompt(sex, age, ethnicity):
@@ -66,6 +79,30 @@ def get_id_code(sex, age, ethnicity):
     return f"{age_code}-{ethnicity_code}-{sex_code}"
 
 
+def replace_with_random_child(line, person_code, sex=None):
+    if sex is None:
+        sex = random.choice(SEXES)
+    age = random.choice(CHILDREN)
+    ethnicity = random.choice(ETHNICITIES)
+    person_id_code = get_id_code(sex, age, ethnicity)
+    if person_code not in line:
+        raise ValueError(f"Person code {person_code} not found in line")
+    line = line.replace(person_code, f"{age} {ethnicity} {SEX_YOUNG[sex]}")
+    return line, person_id_code
+
+
+def replace_with_random_adult(line, person_code, sex=None):
+    if sex is None:
+        sex = random.choice(SEXES)
+    age = random.choice(ADULTS)
+    ethnicity = random.choice(ETHNICITIES)
+    person_id_code = get_id_code(sex, age, ethnicity)
+    if person_code not in line:
+        raise ValueError(f"Person code {person_code} not found in line")
+    line = line.replace(person_code, f"{age} {ethnicity} {sex}")
+    return line, person_id_code
+
+
 def replace_with_random_person(line, person_code):
     sex = random.choice(SEXES)
     age = random.choice(AGES)
@@ -83,7 +120,7 @@ def enchance_prompt(prompt: str, style_name: str):
     pass
 
 
-def process_file(file_path):
+def process_file(file_path, n_people=1):
     processed_lines = []
     with open(file_path) as file:
         for line in file.readlines():
@@ -94,6 +131,10 @@ def process_file(file_path):
                 + line.strip()
                 + " . high quality, detailed photograph, (visible face:0.8)"
             )
+            if n_people > 1:
+                processed_line = processed_line.replace(
+                    ". high quality", f". {NUM_TO_WORD[n_people]} people, high quality"
+                )
             # line_with_person_replaced = replace_person(processed_line)
             processed_lines.append(processed_line)
     return processed_lines

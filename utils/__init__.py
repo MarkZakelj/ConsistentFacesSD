@@ -1,6 +1,7 @@
 import io
 import os
 import traceback
+from random import randint
 
 from .sequential_timer import SequentialTimer
 
@@ -9,6 +10,10 @@ def get_exception_traceback_str(exc: Exception) -> str:
     file = io.StringIO()
     traceback.print_exception(exc, file=file)
     return file.getvalue().rstrip()
+
+
+def get_random_comfy_seed():
+    return randint(0, 1125899906842623)
 
 
 def list_directories_in_directory(directory_path):
