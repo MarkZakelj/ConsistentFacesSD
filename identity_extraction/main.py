@@ -7,10 +7,14 @@ from PIL import Image
 from scipy.optimize import linear_sum_assignment
 from tqdm import tqdm
 
+from face_similarity import FaceEmbedDistance, InsightFace, NoFilterCriteriaError
 from image_creation.prompt_construction import construct_identity_prompt_from_code
 from utils import list_directories_in_directory
 from utils.imgs import (
     get_face_imgs,
+    get_identity_img,
+    get_img,
+    get_img_from_bbox,
     get_img_info,
     get_number_of_images,
     get_prompt_seed_pairs,
@@ -19,6 +23,8 @@ from utils.imgs import (
     update_img_info,
 )
 from utils.paths import OUTPUT_DIR
+
+insightFace = InsightFace()
 
 device = "mps"
 FORCE = False
@@ -139,6 +145,54 @@ def extract_all_identities_on_subset(subset_name: str):
         update_img_info(subset_name, i, info)
 
 
+def extract_using_embedd_distance(subset_name: str):
+    if subset_name in skip_subsets:
+        return
+    logger.info("SUBSET NAME: " + subset_name)
+
+    subset_info = get_subset_info(subset_name)
+    n_people = len(subset_info["person_codes"])
+    prompt_seed_pairs = get_prompt_seed_pairs(n_people)
+    fed = FaceEmbedDistance()
+    n_images = get_number_of_images(subset_name)
+    for i in tqdm(range(n_images)):
+        info = get_img_info(subset_name, i)
+        if "face_info" not in info:
+            continue
+        img = get_img(subset_name, i)
+        face_info = info["face_info"]
+        id_codes = list(prompt_seed_pairs[i]["people"].values())
+        id_images = [get_identity_img(id_code) for id_code in id_codes]
+        scores = []
+
+        for face in face_info:
+            face_scores = []
+            target_img = get_img_from_bbox(img, face["bbox"], square=False, pad=0.1)
+            for id_img in id_images:
+                try:
+                    dist = fed.analize(
+                        insightFace,
+                        torch.from_numpy(id_img).unsqueeze(0),
+                        torch.from_numpy(target_img).unsqueeze(0),
+                        "cosine",
+                        filter_thresh=1.0,
+                        filter_best=0,
+                    )
+                    face_scores.append(dist[0])
+                except NoFilterCriteriaError:
+                    face_scores.append(1.0)
+            scores.append(face_scores)
+        rows, cols = linear_sum_assignment(scores)
+        for r, c in zip(rows, cols):
+            try:
+                face_info[r]["identity"] = id_codes[c]
+            except KeyError as e:
+                print(id_codes)
+                print(face_info)
+                print("Error", r, c, len(face_info), len(id_codes), i)
+        update_img_info(subset_name, i, info)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Identity extraction for a given subset of images."
@@ -167,6 +221,7 @@ def main():
             label_left_to_right(subset)
         else:
             extract_all_identities_on_subset(subset)
+            # extract_using_embedd_distance(subset)
 
 
 if __name__ == "__main__":

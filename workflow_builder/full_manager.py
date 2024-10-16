@@ -13,6 +13,7 @@ from .manager_modules import (
     PoseManager,
     PoseMaskManager,
     SingleCharacterManager,
+    SingleCharacterManagerFaceID,
 )
 from .nodes import FaceBoundingBox, FaceDetailer, ImageResize, LoraLoaderStack, Manager
 from .workflow_utils import load_workflow, trim_workflow
@@ -58,7 +59,7 @@ class FullManager(Manager):
 class TextToImageWorkflowManager(FullManager):
     def __init__(self, features=None):
         super().__init__()
-        possible_features = {"lora", "face", "pose", "character"}
+        possible_features = {"lora", "face", "pose", "character", "ip-faceid"}
         if features is None:
             features = []
         # check validity of features
@@ -70,13 +71,20 @@ class TextToImageWorkflowManager(FullManager):
 
         # load the full workflow - later skip the unnecessary parts
         self.workflow = load_workflow("text_to_image_full.json")
+        if "ip-faceid" in features:
+            self.workflow = load_workflow("text_to_image_faceid_full.json")
 
         # initialize the composed managers (composition ftw)
         self.basic: BasicManager = BasicManager(workflow=self.workflow)
         self.lora: LoraLoaderStack = LoraLoaderStack(workflow=self.workflow)
-        self.character: SingleCharacterManager = SingleCharacterManager(
-            workflow=self.workflow, unique_name="Face"
-        )
+        if "ip-faceid" in features:
+            self.character: SingleCharacterManagerFaceID = SingleCharacterManagerFaceID(
+                workflow=self.workflow, unique_name="Face"
+            )
+        else:
+            self.character: SingleCharacterManager = SingleCharacterManager(
+                workflow=self.workflow, unique_name="Face"
+            )
         self.face: FaceDetailer = FaceDetailer(workflow=self.workflow)
         self.pose: PoseManager = PoseManager(workflow=self.workflow)
 
@@ -94,11 +102,12 @@ class TextToImageWorkflowManager(FullManager):
             wfu.skip_node("FaceDetailer0", [("image", 0)], self.workflow)
 
         if "pose" not in features:
-            wfu.skip_node(
-                "ApplyControlNet(Advanced)0",
-                [("positive", 0), ("negative", 1)],
-                self.workflow,
-            )
+            if "ip-faceid" not in features:
+                wfu.skip_node(
+                    "ApplyControlNet(Advanced)0",
+                    [("positive", 0), ("negative", 1)],
+                    self.workflow,
+                )
 
         if "nsfw_skip" in features:
             wfu.skip_node("NudenetDetector0", [("image", 0)], self.workflow)
@@ -178,7 +187,11 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
         if features is None:
             features = []
 
-        check_valid_features(features, {"no-face-detailer", "no-facematch"})
+        check_valid_features(
+            features,
+            {"no-face-detailer", "no-facematch", "no-controlnet", "no-reference"},
+        )
+        # no-reference can be used when dealing with one subject as the IP-adapters wont have attention masks
 
         self.workflow = load_workflow("multiple_characters_workflow_full.json")
 
@@ -202,6 +215,13 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
         if "no-facematch" in features:
             wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
 
+        if "no-controlnet" in features:
+            wfu.skip_node(
+                "ApplyControlNet(Advanced)0",
+                [("positive", 0), ("negative", 1)],
+                self.workflow,
+            )
+
 
 class MultipleCharactersNormalIPWorkflowManager(FullManager):
     def __init__(self, n_characters: int, features=None):
@@ -209,7 +229,9 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
         if features is None:
             features = []
 
-        check_valid_features(features, {"no-face-detailer", "no-facematch"})
+        check_valid_features(
+            features, {"no-face-detailer", "no-facematch", "no-controlnet"}
+        )
 
         self.workflow = load_workflow(
             "multiple_characters_normal_ip_workflow_full.json"
@@ -234,6 +256,13 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
 
         if "no-facematch" in features:
             wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
+
+        if "no-controlnet" in features:
+            wfu.skip_node(
+                "ApplyControlNet(Advanced)0",
+                [("positive", 0), ("negative", 1)],
+                self.workflow,
+            )
 
 
 class MCFaceIDFaceSwapWorkflowManager(FullManager):

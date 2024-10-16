@@ -195,6 +195,15 @@ class SingleCharacterManager(Manager):
         self.ip_adapter.set_end_at(*args, **kwargs)
 
 
+class SingleCharacterManagerFaceID(SingleCharacterManager):
+    def __init__(self, workflow: dict, unique_name: str = ""):
+        super().__init__(workflow, unique_name)
+        self.ip_adapter = IPAdapterFaceID(workflow, f"IPAdapterFaceID{unique_name}0")
+
+    def set_weight_v2(self, *args, **kwargs):
+        self.ip_adapter.set_weight_v2(*args, **kwargs)
+
+
 class CharactersManager(Manager):
     def __init__(self, workflow: dict):
         super().__init__(workflow)

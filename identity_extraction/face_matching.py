@@ -20,6 +20,9 @@ from utils.imgs import (
 )
 from utils.paths import MODELS_DIR
 
+# from face_similarity import FaceMatcher
+
+
 skip_subsets = ["identities"]
 
 RESNET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(1, 3, 1, 1)

@@ -128,6 +128,30 @@ configs: dict[str, dict[str, Any]] = {
         "iptype": "normal",
         "ip_weight": 0.5,
     },
+    "two_people_faceid_no_controlnet": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-controlnet"],
+    },
+    "three_people_faceid_no_controlnet": {
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-controlnet"],
+    },
+    "two_people_normalip_no_controlnet": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-controlnet"],
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
+    "three_people_normalip_no_controlnet": {
+        "person_codes": ["PERSON1", "PERSON2", "PERSON3"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["no-controlnet"],
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
 }
 
 
@@ -269,7 +293,7 @@ async def generate_dataset(config_name: str):
 async def main():
     print("Generating image datasets")
     for config_name in configs:
-        print(f"Generating dataset for {config_name}", flush=True)
+        print(f"\nGenerating dataset for {config_name}", flush=True)
         await generate_dataset(config_name)
 
 

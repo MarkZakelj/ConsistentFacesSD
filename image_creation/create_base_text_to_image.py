@@ -110,6 +110,12 @@ configs: dict[str, dict[str, Any]] = {
         "features": ["face"],
         "new_seeds": True,
     },
+    "faceid_one_person+face": {
+        "person_codes": ["PERSON1"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "features": ["character", "ip-faceid", "face"],
+        "character": {"weight": 1.0, "weightv2": 0.8},
+    },
 }
 
 
@@ -198,6 +204,8 @@ async def generate_dataset(config_name: str):
                 wf.character.set_end_at(character.get("end_at", 1.0))
                 wf.character.set_start_at(character.get("start_at", 0.0))
                 wf.character.set_weight_type(character.get("weight_type", "linear"))
+                if "ip-faceid" in features:
+                    wf.character.set_weight_v2(character.get("weightv2", 1.0))
 
         wf.trim_workflow()
 

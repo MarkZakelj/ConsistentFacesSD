@@ -49,5 +49,10 @@
   "IPAdapterFace00": "48",
   "IPAdapterFace10": "49",
   "IPAdapter20": "50",
-  "IPAdapterFace20": "51"
+  "IPAdapterFace20": "51",
+  "LoadImageFace0": "52",
+  "LoadPosesJSON0": "53",
+  "FilterPoses0": "54",
+  "IPAdapterFaceIDFace0": "55",
+  "LoadImage(Base64)Face0": "56"
 }
