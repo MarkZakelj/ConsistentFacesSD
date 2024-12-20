@@ -1,7 +1,10 @@
 import json
 import os
+import random
+from enum import Enum
 
 from image_creation.prompt_construction import (
+    AGES,
     process_file,
     replace_with_random_adult,
     replace_with_random_child,
@@ -73,6 +76,37 @@ def create_child_adult_prompt_seeds():
     return ps_pairs
 
 
+def create_man_woman_prompt_seeds():
+    # use for 2 people
+    filepath = os.path.join(DATA_DIR, "raw_prompts_man_woman_2.txt")
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"File {filepath} not found")
+    lines = process_file(filepath, n_people=2)
+    ps_pairs = []
+    for i, line in enumerate(lines):
+        for s in range(NSEEDS):
+            prompt = line
+            people = {}
+            age = random.choice(AGES)
+            prompt, person_id_code = replace_with_random_person(
+                prompt, PERSON_CODES[0], "man", age
+            )
+            people[PERSON_CODES[0]] = person_id_code
+            prompt, person_id_code = replace_with_random_person(
+                prompt, PERSON_CODES[1], "woman", age
+            )
+            people[PERSON_CODES[1]] = person_id_code
+            seed = get_random_comfy_seed()
+            pair = {
+                "prompt": prompt,
+                "seed": seed,
+                "people": people,
+                "img_code": i * NSEEDS + s,
+            }
+            ps_pairs.append(pair)
+    return ps_pairs
+
+
 def copy_and_change_seeds(n_people: int):
     filepath = os.path.join(DATA_DIR, f"prompt_seed_pairs_{n_people}.json")
     if not os.path.exists(filepath):
@@ -90,7 +124,15 @@ def copy_and_change_seeds(n_people: int):
 
 
 COPY = False
-CHILD_ADULT = True
+
+
+class Setting(Enum):
+    NORMAL = "NORMAL"
+    CHILD_ADULT = "CHILD_ADULT"
+    MAN_WOMAN = "MAN_WOMAN"
+
+
+SETTING = Setting.MAN_WOMAN
 N_PEOPLE = [2]
 
 
@@ -99,21 +141,35 @@ def main():
         if COPY:
             copy_and_change_seeds(n)
             continue
-        if CHILD_ADULT:
-            filepath = os.path.join(DATA_DIR, f"prompt_seed_pairs_child_adult_{n}.json")
-            if os.path.exists(filepath):
+        match SETTING:
+            case Setting.NORMAL:
+                filepath = os.path.join(DATA_DIR, f"prompt_seed_pairs_{n}.json")
+                # if os.path.exists(filepath):
+                #     continue
+                pairs = create_from_raw_prompts(n)
+                print("LEN pairs", len(pairs))
+                with open(filepath, "w") as file:
+                    json.dump(pairs, file, indent=2)
+            case Setting.CHILD_ADULT:
+                filepath = os.path.join(
+                    DATA_DIR, f"prompt_seed_pairs_child_adult_{n}.json"
+                )
+                if os.path.exists(filepath):
+                    continue
+                pairs = create_child_adult_prompt_seeds()
+                print("LEN pairs", len(pairs))
+                json.dump(pairs, open(filepath, "w"), indent=2)
                 continue
-            pairs = create_child_adult_prompt_seeds()
-            print("LEN pairs", len(pairs))
-            json.dump(pairs, open(filepath, "w"), indent=2)
-            continue
-        filepath = os.path.join(DATA_DIR, f"prompt_seed_pairs_{n}.json")
-        # if os.path.exists(filepath):
-        #     continue
-        pairs = create_from_raw_prompts(n)
-        print("LEN pairs", len(pairs))
-        with open(filepath, "w") as file:
-            json.dump(pairs, file, indent=2)
+            case Setting.MAN_WOMAN:
+                filepath = os.path.join(
+                    DATA_DIR, f"prompt_seed_pairs_man_woman_{n}.json"
+                )
+                if os.path.exists(filepath):
+                    continue
+                pairs = create_man_woman_prompt_seeds()
+                print("LEN pairs", len(pairs))
+                json.dump(pairs, open(filepath, "w"), indent=2)
+                continue
 
 
 if __name__ == "__main__":

@@ -4,16 +4,17 @@ import clip
 import torch
 from PIL import Image
 
-device = "cuda" if torch.cuda.is_available() else "mps"
-model, preprocess = clip.load("ViT-B/32", device=device)
-
-image = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
-image2 = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
-text = clip.tokenize(["a diagram", "a dog", "a cat", "a machine learning"]).to(device)
-print(text.shape)
-
 
 def main():
+    device = "cuda" if torch.cuda.is_available() else "mps"
+    model, preprocess = clip.load("ViT-B/32", device=device)
+
+    image = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
+    image2 = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
+    text = clip.tokenize(["a diagram", "a dog", "a cat", "a machine learning"]).to(
+        device
+    )
+    print(text.shape)
 
     with torch.no_grad():
         t0 = perf_counter()

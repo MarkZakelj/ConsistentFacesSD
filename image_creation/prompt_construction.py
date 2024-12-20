@@ -103,9 +103,11 @@ def replace_with_random_adult(line, person_code, sex=None):
     return line, person_id_code
 
 
-def replace_with_random_person(line, person_code):
-    sex = random.choice(SEXES)
-    age = random.choice(AGES)
+def replace_with_random_person(line, person_code, sex=None, age=None):
+    if sex is None:
+        sex = random.choice(SEXES)
+    if age is None:
+        age = random.choice(AGES)
     ethnicity = random.choice(ETHNICITIES)
     person_id_code = get_id_code(sex, age, ethnicity)
     if age == "5-year-old":

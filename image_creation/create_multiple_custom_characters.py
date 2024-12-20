@@ -152,6 +152,32 @@ configs: dict[str, dict[str, Any]] = {
         "iptype": "normal",
         "ip_weight": 0.5,
     },
+    "man_woman_faceid_rev_facematch": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "prompt_seed_pairs_filename": "prompt_seed_pairs_man_woman_2.json",
+        "features": ["reverse-facematch"],
+    },
+    "man_woman_faceid": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "prompt_seed_pairs_filename": "prompt_seed_pairs_man_woman_2.json",
+    },
+    "man_woman_normalip": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "prompt_seed_pairs_filename": "prompt_seed_pairs_man_woman_2.json",
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
+    "man_woman_normalip_rev_facematch": {
+        "person_codes": ["PERSON1", "PERSON2"],
+        "checkpoint": "DreamShaperXL_Lightning.safetensors",
+        "prompt_seed_pairs_filename": "prompt_seed_pairs_man_woman_2.json",
+        "features": ["reverse-facematch"],
+        "iptype": "normal",
+        "ip_weight": 0.5,
+    },
 }
 
 
