@@ -1,6 +1,8 @@
 # Consistent Multi-Face Generation with SDXL
 Default IP-Adapters with StableDiffusion XL model suffer from inability to properly localise effects of multiple IP-Adapters to multiple facial identities and keep the image variability the same. With this algorithmic pipeline approach, we solve this problem and introduce a Face-Matching module for selecting the most fitting position for each reference face in the final image.
 
+<img src="figures/story-example-0.jpg" alt="Story One" width="400"> <img src="figures/story-example-1.jpg" alt="Story Two" width="400">
+
 The algorithm consists of 
 1. Generation of Reference image (with sdxl or any other model)
 2. Face Detection on the generated reference image
@@ -35,6 +37,7 @@ The method was evaluated on various metrics:
 First, face detection is needed in the generated images, so run:
 `python face_detection/face_detection.py`
 
+## Evaluation
 To evaluate in each metric, run the appropriate `main.py` file in the directories:
 - `clip_iqa`
 - `face_similarity`
