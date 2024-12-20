@@ -178,6 +178,7 @@ def main():
 
     # Show prompts option
     show_prompts = st.sidebar.checkbox("Show prompts", key="show_prompts")
+    show_number = st.sidebar.checkbox("Show image numbers", key="show_number")
 
     show_clip_scores = st.sidebar.checkbox("Show clip scores", key="show_clip_scores")
 
@@ -275,7 +276,8 @@ def main():
 
                     if show_headposes and "face_info" in img_info:
                         img = draw_headposes(img, img_info["face_info"])
-                    img = draw_img_num(img, img_num)
+                    if show_number:
+                        img = draw_img_num(img, img_num)
                     if show_clip_scores:
                         clip_score = img_info.get("clip_score", {}).get(
                             "openai/clip-vit-base-patch16", 0
