@@ -99,3 +99,12 @@ class IPAdapterFaceID(IPAdapter):
 
     def set_weight_v2(self, weight: float):
         self.workflow[self.keyname]["inputs"]["weight_faceidv2"] = weight
+
+
+class FaceMatcher(Manager):
+    def __init__(self, workflow, keyname="FaceMatcher0"):
+        super().__init__(workflow)
+        self.keyname = keyname
+
+    def set_reverse(self, reverse: bool):
+        self.workflow[self.keyname]["inputs"]["reverse"] = reverse

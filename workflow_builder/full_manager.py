@@ -15,7 +15,14 @@ from .manager_modules import (
     SingleCharacterManager,
     SingleCharacterManagerFaceID,
 )
-from .nodes import FaceBoundingBox, FaceDetailer, ImageResize, LoraLoaderStack, Manager
+from .nodes import (
+    FaceBoundingBox,
+    FaceDetailer,
+    FaceMatcher,
+    ImageResize,
+    LoraLoaderStack,
+    Manager,
+)
 from .workflow_utils import load_workflow, trim_workflow
 
 logger = logging.getLogger("uvicorn")
@@ -189,7 +196,13 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
 
         check_valid_features(
             features,
-            {"no-face-detailer", "no-facematch", "no-controlnet", "no-reference"},
+            {
+                "no-face-detailer",
+                "no-facematch",
+                "no-controlnet",
+                "no-reference",
+                "reverse-facematch",
+            },
         )
         # no-reference can be used when dealing with one subject as the IP-adapters wont have attention masks
 
@@ -201,6 +214,7 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
         self.character: CharactersManagerFaceID = CharactersManagerFaceID(
             workflow=self.workflow, ip_adapter_node_base_name="IPAdapterFaceID"
         )
+        self.face_matcher: FaceMatcher = FaceMatcher(workflow=self.workflow)
 
         self.pose_mask.set_n_poses(10)
         for i in range(n_characters, MAX_CHARACTERS):
@@ -214,6 +228,9 @@ class MultipleCharactersFaceIdWorkflowManager(FullManager):
 
         if "no-facematch" in features:
             wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
+
+        if "reverse-facematch" in features:
+            self.face_matcher.set_reverse(True)
 
         if "no-controlnet" in features:
             wfu.skip_node(
@@ -230,7 +247,8 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
             features = []
 
         check_valid_features(
-            features, {"no-face-detailer", "no-facematch", "no-controlnet"}
+            features,
+            {"no-face-detailer", "no-facematch", "no-controlnet", "reverse-facematch"},
         )
 
         self.workflow = load_workflow(
@@ -243,6 +261,7 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
         self.character: CharactersManagerNormalIP = CharactersManagerNormalIP(
             workflow=self.workflow, ip_adapter_node_base_name="IPAdapter"
         )
+        self.face_matcher: FaceMatcher = FaceMatcher(workflow=self.workflow)
 
         self.pose_mask.set_n_poses(10)
         for i in range(n_characters, MAX_CHARACTERS):
@@ -256,6 +275,9 @@ class MultipleCharactersNormalIPWorkflowManager(FullManager):
 
         if "no-facematch" in features:
             wfu.remove_inputs("MaskFromPoints0", ["mask_mapping"], self.workflow)
+
+        if "reverse-facematch" in features:
+            self.face_matcher.set_reverse(True)
 
         if "no-controlnet" in features:
             wfu.skip_node(

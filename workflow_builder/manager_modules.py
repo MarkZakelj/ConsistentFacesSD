@@ -400,3 +400,8 @@ class PoseMaskManager(Manager):
 
     def set_seed(self, seed: int):
         self.workflow["KSamplerPose0"]["inputs"]["seed"] = seed
+
+    def set_reverse_facematch(self, reverse_facematch: bool):
+        self.workflow["KSamplerPose0"]["inputs"][
+            "reverse_facematch"
+        ] = reverse_facematch
